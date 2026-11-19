@@ -1,7 +1,6 @@
 export interface IntroConfig {
   title: string;
   promptText: string;
-  skipLabel: string;
   reducedMotionButtonLabel: string;
   srDescription: string;
   sessionStorageKey: string;
@@ -16,7 +15,6 @@ export interface IntroConfig {
 export const introConfig: IntroConfig = {
   title: "AGUSTIN",
   promptText: "SCROLL TO ENTER",
-  skipLabel: "SKIP",
   reducedMotionButtonLabel: "ENTER",
   srDescription: "AGUSTIN, portfolio. Scroll to enter.",
   sessionStorageKey: "agustin_intro_played",

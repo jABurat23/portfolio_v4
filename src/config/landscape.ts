@@ -1,14 +1,3 @@
-export interface MonolithSpec {
-  id: string;
-  x: number;
-  z: number;
-  width: number;
-  height: number;
-  depth: number;
-  rotationY: number;
-  embedDepth: number;
-}
-
 export interface LandscapeConfig {
   terrain: {
     width: number;
@@ -21,7 +10,6 @@ export interface LandscapeConfig {
     ridgeStrength: number;
     foregroundClearZ: number;
   };
-  monoliths: MonolithSpec[];
   light: {
     position: readonly [number, number, number];
     target: readonly [number, number, number];
@@ -50,7 +38,6 @@ export interface LandscapeConfig {
     parallaxY: number;
     damping: number;
   };
-  scrollHint: string;
 }
 
 export const landscapeConfig: LandscapeConfig = {
@@ -65,58 +52,16 @@ export const landscapeConfig: LandscapeConfig = {
     ridgeStrength: 0.8,
     foregroundClearZ: 7,
   },
-  monoliths: [
-    {
-      id: "monolith-near-right",
-      x: 5.4,
-      z: -12,
-      width: 1.05,
-      height: 5.8,
-      depth: 0.9,
-      rotationY: -0.28,
-      embedDepth: 0.7,
-    },
-    {
-      id: "monolith-mid-left",
-      x: -7.8,
-      z: -15.5,
-      width: 1.25,
-      height: 6.6,
-      depth: 0.95,
-      rotationY: 0.42,
-      embedDepth: 0.75,
-    },
-    {
-      id: "monolith-far-right",
-      x: 13.5,
-      z: -24,
-      width: 1.4,
-      height: 8.2,
-      depth: 1.05,
-      rotationY: 0.22,
-      embedDepth: 0.85,
-    },
-    {
-      id: "monolith-far-center",
-      x: -1.6,
-      z: -25,
-      width: 1.15,
-      height: 7.4,
-      depth: 0.95,
-      rotationY: -0.36,
-      embedDepth: 0.75,
-    },
-  ],
   light: {
-    position: [-26, 8.0, -4],
+    position: [-26, 7.2, -4],
     target: [0, 0, -14],
-    intensity: 2.6,
+    intensity: 2.75,
     color: "#ffffff",
     shadowMapSize: 1024,
-    shadowFrustum: 34,
+    shadowFrustum: 28,
     shadowNear: 1,
-    shadowFar: 85,
-    shadowBias: -0.0005,
+    shadowFar: 80,
+    shadowBias: -0.0004,
     shadowNormalBias: 0.04,
   },
   fog: {
@@ -127,7 +72,7 @@ export const landscapeConfig: LandscapeConfig = {
   camera: {
     fov: 46,
     position: [0, 2.5, 11],
-    target: [0, 2.0, -18],
+    target: [0, 1.9, -18],
     driftAmplitudeX: 0.45,
     driftAmplitudeY: 0.16,
     driftSpeed: 0.12,
@@ -135,5 +80,4 @@ export const landscapeConfig: LandscapeConfig = {
     parallaxY: 0.28,
     damping: 2.8,
   },
-  scrollHint: "SCROLL",
 };

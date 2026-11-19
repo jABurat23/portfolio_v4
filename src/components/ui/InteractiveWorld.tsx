@@ -7,10 +7,10 @@ import { contactConfig } from "@/config/contact";
 import { getTotalJourneyVh } from "@/config/journey";
 import { worksConfig } from "@/config/works";
 import Hero from "./Hero";
-import Hud from "./Hud";
 import IntroOverlay from "./IntroOverlay";
 import ProjectCard from "./ProjectCard";
 import ScrollManager from "./ScrollManager";
+import SiteNavbar from "./SiteNavbar";
 import VoidPanels from "./VoidPanels";
 import { WebGLErrorBoundary } from "./WebGLErrorBoundary";
 
@@ -70,7 +70,7 @@ export default function InteractiveWorld({
       <Hero visible={introDone} />
       <ProjectCard visible={introDone} />
       <VoidPanels visible={introDone} />
-      <Hud visible={introDone} />
+      {introDone ? <SiteNavbar /> : null}
       <section aria-label="Works" className="sr-only">
         <h2>Works</h2>
         <ul>

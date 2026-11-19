@@ -28,25 +28,36 @@ export function subscribeScrollProgress(
   };
 }
 
-type ScrollToTopHandler = () => void;
+type ScrollToProgressHandler = (progress: number) => void;
 
-let scrollToTopHandler: ScrollToTopHandler | null = null;
+let scrollToProgressHandler: ScrollToProgressHandler | null = null;
 
-export function registerScrollToTop(handler: ScrollToTopHandler): () => void {
-  scrollToTopHandler = handler;
+export function registerScrollToProgress(
+  handler: ScrollToProgressHandler,
+): () => void {
+  scrollToProgressHandler = handler;
   return () => {
-    if (scrollToTopHandler === handler) {
-      scrollToTopHandler = null;
+    if (scrollToProgressHandler === handler) {
+      scrollToProgressHandler = null;
     }
   };
 }
 
-export function scrollToTop(): void {
-  if (scrollToTopHandler) {
-    scrollToTopHandler();
+export function scrollToProgress(progress: number): void {
+  const clamped = clamp01(progress);
+  if (scrollToProgressHandler) {
+    scrollToProgressHandler(clamped);
     return;
   }
   if (typeof window !== "undefined") {
-    window.scrollTo({ top: 0, behavior: "auto" });
+    const maxScroll = Math.max(
+      0,
+      document.documentElement.scrollHeight - window.innerHeight,
+    );
+    window.scrollTo({ top: Math.round(clamped * maxScroll), behavior: "auto" });
   }
+}
+
+export function scrollToTop(): void {
+  scrollToProgress(0);
 }

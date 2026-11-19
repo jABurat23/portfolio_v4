@@ -47,7 +47,7 @@ export function sampleTerrainHeight(x: number, z: number): number {
     height *= blend;
   }
 
-  // Smoothly flatten dunes into a level causeway beyond the far monoliths.
+  // Smoothly flatten dunes into a level causeway approaching the corridor.
   const {
     flattenStartZ,
     flattenEndZ,

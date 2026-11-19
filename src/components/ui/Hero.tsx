@@ -1,8 +1,8 @@
 "use client";
 
+import { MouseScrollIcon } from "@phosphor-icons/react/dist/ssr/MouseScroll";
 import { useEffect, useRef } from "react";
 import { journeyConfig } from "@/config/journey";
-import { landscapeConfig } from "@/config/landscape";
 import { siteConfig } from "@/config/site";
 import { getScrollProgress, subscribeScrollProgress } from "@/lib/scrollProgress";
 
@@ -69,9 +69,14 @@ export default function Hero({ visible }: HeroProps) {
         </div>
       </header>
 
-      <div ref={hintRef} className="flex justify-center">
-        <span className="border border-line bg-background px-4 py-1.5 font-mono text-xs tracking-[0.28em] text-ink uppercase">
-          {landscapeConfig.scrollHint}
+      <div ref={hintRef} className="flex justify-center pb-12 sm:pb-12">
+        <span className="border border-line bg-background p-2">
+          <MouseScrollIcon
+            size={22}
+            weight="light"
+            aria-hidden="true"
+            className="block text-ink motion-safe:animate-scroll-bob"
+          />
         </span>
       </div>
     </section>

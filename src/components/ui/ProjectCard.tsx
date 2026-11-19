@@ -1,5 +1,6 @@
 "use client";
 
+import { ArrowUpRightIcon } from "@phosphor-icons/react/dist/ssr/ArrowUpRight";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getCorridorFrameFocus } from "@/config/journey";
@@ -89,7 +90,7 @@ export default function ProjectCard({ visible }: ProjectCardProps) {
       <div
         ref={cardWrapRef}
         aria-hidden="true"
-        className={`pointer-events-none fixed inset-x-6 bottom-16 opacity-0 md:inset-x-auto md:top-1/2 md:bottom-auto md:w-80 md:-translate-y-1/2 lg:w-[22rem] ${desktopSideClass}`}
+        className={`pointer-events-none fixed inset-x-6 bottom-20 opacity-0 md:inset-x-auto md:top-1/2 md:bottom-auto md:w-80 md:-translate-y-1/2 lg:w-[22rem] ${desktopSideClass}`}
       >
         {item ? (
           <article className="border border-line bg-background p-3 md:p-4">
@@ -136,9 +137,15 @@ export default function ProjectCard({ visible }: ProjectCardProps) {
                       href={item.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={OUTLINED_BUTTON_CLASS}
+                      className={`${OUTLINED_BUTTON_CLASS} gap-1.5`}
                     >
-                      VIEW PROJECT
+                      <span>VIEW PROJECT</span>
+                      <ArrowUpRightIcon
+                        size={14}
+                        weight="regular"
+                        aria-hidden="true"
+                        className="shrink-0"
+                      />
                     </a>
                   </div>
                 ) : null}

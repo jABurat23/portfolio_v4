@@ -5,7 +5,6 @@ import { useEffect, useRef } from "react";
 import type { DirectionalLight } from "three";
 import { landscapeConfig } from "@/config/landscape";
 import DuneTerrain from "./DuneTerrain";
-import Monoliths from "./Monoliths";
 
 export interface LandscapeSceneProps {
   initialShadowsEnabled?: boolean;
@@ -81,7 +80,6 @@ export default function LandscapeScene({
       />
 
       <DuneTerrain />
-      <Monoliths />
     </>
   );
 }

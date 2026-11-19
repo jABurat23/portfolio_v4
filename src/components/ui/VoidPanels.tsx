@@ -1,5 +1,6 @@
 "use client";
 
+import { ArrowUpRightIcon } from "@phosphor-icons/react/dist/ssr/ArrowUpRight";
 import { type MouseEvent, useCallback, useEffect, useRef } from "react";
 import { aboutConfig } from "@/config/about";
 import { contactConfig } from "@/config/contact";
@@ -76,7 +77,7 @@ export default function VoidPanels({ visible }: VoidPanelsProps) {
   return (
     <section
       aria-label="About and Contact"
-      className="pointer-events-none fixed inset-0 z-20 flex h-dvh items-center justify-center px-5 py-20 sm:px-10"
+      className="pointer-events-none fixed inset-0 z-20 flex h-dvh items-center justify-center px-5 pt-10 pb-24 sm:px-10 sm:pt-12 sm:pb-28"
     >
       <div className="relative flex w-full max-w-lg items-center justify-center">
         <div ref={aboutRef} aria-hidden="true" className="w-full opacity-0">
@@ -104,12 +105,15 @@ export default function VoidPanels({ visible }: VoidPanelsProps) {
                     className={CONTACT_ROW_LINK_CLASS}
                   >
                     <span className={CONTACT_ROW_LABEL_CLASS}>{item.label}</span>
-                    <span className="flex min-w-0 items-baseline gap-1.5">
+                    <span className="flex min-w-0 items-center gap-1.5">
                       <span className={CONTACT_ROW_VALUE_CLASS}>{item.text}</span>
                       {item.external ? (
-                        <span aria-hidden="true" className={CONTACT_ROW_ARROW_CLASS}>
-                          ↗
-                        </span>
+                        <ArrowUpRightIcon
+                          size={14}
+                          weight="regular"
+                          aria-hidden="true"
+                          className={CONTACT_ROW_ARROW_CLASS}
+                        />
                       ) : null}
                     </span>
                   </a>

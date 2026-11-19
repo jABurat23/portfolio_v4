@@ -8,7 +8,6 @@ export interface JourneyWaypoint {
 
 export interface JourneyZone {
   id: string;
-  label: string;
   scrollVh: number;
   waypoints: readonly JourneyWaypoint[];
 }
@@ -83,10 +82,10 @@ function buildCorridorWaypoints(): JourneyWaypoint[] {
 }
 
 const landscapeWaypoints: readonly JourneyWaypoint[] = [
-  { position: [0, 2.5, 11], target: [0, 2.0, -18] },
-  { position: [-1.4, 2.8, 2.5], target: [0.6, 2.3, -20] },
-  { position: [0.8, 3.0, -7], target: [2.6, 2.8, -23.5] },
-  { position: [2.8, 3.3, -15.5], target: [4.8, 3.3, -25.5] },
+  { position: [0, 2.5, 11], target: [0, 1.9, -18] },
+  { position: [-1.2, 2.7, 2.0], target: [-0.2, 1.85, -22] },
+  { position: [0.9, 2.8, -7.5], target: [0.2, 1.9, -30] },
+  { position: [0.4, 2.65, -16.5], target: [0.1, 2.0, -39] },
 ];
 
 const corridorWaypoints = buildCorridorWaypoints();
@@ -121,19 +120,16 @@ export const journeyConfig: JourneyConfig = {
   zones: [
     {
       id: "landscape",
-      label: "[ 01 / LANDSCAPE ]",
       scrollVh: 250,
       waypoints: landscapeWaypoints,
     },
     {
       id: "corridor",
-      label: "[ 02 / CORRIDOR ]",
       scrollVh: Math.max(1, worksConfig.items.length) * worksConfig.corridor.vhPerFrame,
       waypoints: corridorWaypoints,
     },
     {
       id: "void",
-      label: "[ 03 / VOID ]",
       scrollVh: voidConfig.scrollVh,
       waypoints: voidWaypoints,
     },
@@ -154,6 +150,28 @@ export const journeyConfig: JourneyConfig = {
 
 export function getTotalJourneyVh(): number {
   return journeyConfig.zones.reduce((sum, zone) => sum + zone.scrollVh, 0);
+}
+
+export interface ZoneProgressRange {
+  startProgress: number;
+  endProgress: number;
+}
+
+export function getZoneProgressRange(zoneId: string): ZoneProgressRange {
+  const zones = journeyConfig.zones;
+  const totalVh = Math.max(1, getTotalJourneyVh());
+
+  let accumulatedVh = 0;
+  for (const zone of zones) {
+    const startProgress = accumulatedVh / totalVh;
+    const endProgress = (accumulatedVh + zone.scrollVh) / totalVh;
+    if (zone.id === zoneId) {
+      return { startProgress, endProgress };
+    }
+    accumulatedVh += zone.scrollVh;
+  }
+
+  return { startProgress: 0, endProgress: 1 };
 }
 
 export function getZoneAtProgress(progress: number): ActiveZoneInfo {

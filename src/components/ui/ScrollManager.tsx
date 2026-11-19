@@ -5,7 +5,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
 import { type RefObject, useEffect, useRef, useState } from "react";
 import { journeyConfig } from "@/config/journey";
-import { registerScrollToTop, setScrollProgress } from "@/lib/scrollProgress";
+import { registerScrollToProgress, setScrollProgress } from "@/lib/scrollProgress";
 
 export interface ScrollManagerProps {
   spacerRef: RefObject<HTMLDivElement | null>;
@@ -94,16 +94,18 @@ export default function ScrollManager({
       : readWindowScrollProgress(spacer);
     setScrollProgress(initial);
 
-    const unregisterScrollToTop = registerScrollToTop(() => {
+    const unregisterScrollToProgress = registerScrollToProgress((progress) => {
+      const maxScroll = Math.max(0, spacer.offsetHeight - window.innerHeight);
+      const targetTop = progress * maxScroll;
       if (lenis && !reducedMotion) {
-        lenis.scrollTo(0);
+        lenis.scrollTo(targetTop);
       } else {
-        window.scrollTo({ top: 0, behavior: "auto" });
+        window.scrollTo({ top: targetTop, behavior: "auto" });
       }
     });
 
     return () => {
-      unregisterScrollToTop();
+      unregisterScrollToProgress();
       ctx.revert();
       triggerRef.current = null;
       if (tickerCallback) {

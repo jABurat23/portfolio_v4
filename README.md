@@ -64,10 +64,20 @@ The site is a static-capable Next.js App Router portfolio with zero required run
 
 ## Adding a Journey Zone
 
-All scroll zones, lengths, HUD labels, and camera waypoints live in `src/config/journey.ts`. To append a new zone (for example Corridor or Void):
+All scroll zones, lengths, and camera waypoints live in `src/config/journey.ts`. To append a new zone:
 
-1. Add a new object to `journeyConfig.zones` with a unique `id`, a mono HUD `label` (e.g. `"[ 02 / CORRIDOR ]"`), its scroll distance `scrollVh` (in `svh` units), and an ordered list of `{ position, target }` camera waypoints.
-2. The scroll spacer height (`getTotalJourneyVh()`), active HUD zone lookup (`getZoneAtProgress()`), and continuous `CatmullRomCurve3` camera path in `CameraRig` update automatically from config.
+1. Add a new object to `journeyConfig.zones` with a unique `id`, its scroll distance `scrollVh` (in `svh` units), and an ordered list of `{ position, target }` camera waypoints.
+2. The scroll spacer height (`getTotalJourneyVh()`), progress ranges (`getZoneProgressRange()`), active zone lookup (`getZoneAtProgress()`), and continuous `CatmullRomCurve3` camera path in `CameraRig` update automatically from config.
+
+## Navigation & Icons
+
+- **Floating PillNav (`src/config/nav.ts`, `src/components/ui/SiteNavbar.tsx`):**
+  - `navConfig.items` (`HOME`, `WORKS`, `ABOUT`, `CONTACT`) computes each item's `targetProgress` directly from `getZoneProgressRange()` (`src/config/journey.ts`), `worksConfig.items.length`, and `voidConfig.panels`.
+  - `getActiveNavHref(progress)` highlights the matching item as the user scrolls; clicking any item or the logo calls `scrollToProgress()` / `scrollToTop()` (`src/lib/scrollProgress.ts`) without mutating the URL hash.
+  - `SiteNavbar` switches cleanly between `sm` (`< 768px`, sized to fit narrow viewports down to `320px`) and `md` (`>= 768px`) without collapsing to a menu button (`collapse="never"`).
+- **Phosphor Icons (`@phosphor-icons/react`):**
+  - `MouseScrollIcon` (`@phosphor-icons/react/dist/ssr/MouseScroll`, `light` weight, `22px`) — animated with `scroll-bob` (`src/app/globals.css`, static under `prefers-reduced-motion`) in `IntroOverlay` and `Hero`.
+  - `ArrowUpRightIcon` (`@phosphor-icons/react/dist/ssr/ArrowUpRight`, `regular` weight, `14px`) — external link indicator on Contact rows (`VoidPanels`, `FallbackView`) and `"VIEW PROJECT"` buttons (`ProjectCard`, `FallbackView`).
 
 ## Adding a Project
 
@@ -88,6 +98,10 @@ All closing Void zone text, links, particle counts, and panel fade timings live 
 - **About copy:** edit `aboutConfig` in `src/config/about.ts`.
 - **Contact links & button text:** edit `contactConfig.items` (`label`, `text`, `href`, `external`) and `backToStartLabel` in `src/config/contact.ts`. External links automatically open in a new tab with `rel="noopener noreferrer"`.
 - **Void density & timing:** edit `voidConfig` in `src/config/void.ts` (`scrollVh`, desktop/mobile dot and dotted-line counts, drift speed, and scroll-progress fade windows for About, Contact, and `"BACK TO START"`).
+
+## Credits
+
+- **PillNav (`src/components/ui/PillNav/`):** Adapted from **React Bits** `PillNav` (converted to TypeScript and flattened to the AGUSTIN dark hairline palette). Please check **React Bits'** current license terms before publishing or redistributing this component.
 
 ## Versioning
 

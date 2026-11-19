@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-11-19
+
+### Added
+
+- Floating bottom-center `PillNav` navigation bar (`src/components/ui/PillNav/PillNav.tsx`, `PillNav.css`, `src/components/ui/SiteNavbar.tsx`) adapted from React Bits PillNav to TypeScript and flattened to solid `#0A0A0A` fills, `1px` `#2A2A2A` hairline borders, `#F2F2F2` active/hover indicators, and zero shadows or backdrop blur while retaining the `999px` pill silhouette.
+- Navigation configuration (`src/config/nav.ts`) deriving scroll targets (`HOME`, `WORKS`, `ABOUT`, `CONTACT`) and active section lookup (`getActiveNavHref`) from `journeyConfig`, `worksConfig`, and `voidConfig`, backed by `getZoneProgressRange` in `src/config/journey.ts` and `scrollToProgress` in `src/lib/scrollProgress.ts` / `ScrollManager.tsx`.
+- `@phosphor-icons/react` (`2.1.10`) regular dependency using direct Next.js RSC-safe per-icon imports (`MouseScrollIcon` for the animated `scroll-bob` scroll cues in `IntroOverlay` and `Hero`, and `ArrowUpRightIcon` for external links in `VoidPanels`, `ProjectCard`, and `FallbackView`).
+
+### Changed
+
+- Removed the `SKIP` button from `IntroOverlay` (`src/components/ui/IntroOverlay.tsx`, `src/config/intro.ts`); entry after the reveal works via wheel, touch swipe, click, or key, while the `prefers-reduced-motion` `ENTER` flow remains intact.
+- Replaced the `"SCROLL"` text box in `Hero` (`src/components/ui/Hero.tsx`) with an animated hairline-framed `MouseScrollIcon` positioned above `SiteNavbar`.
+- Replaced `"↗"` text glyphs on Contact rows and `"VIEW PROJECT"` links with `ArrowUpRightIcon`.
+- Re-aimed Landscape camera waypoints (`src/config/journey.ts`) and Landscape directional lighting/shadow frustum (`src/config/landscape.ts`) to highlight dune silhouettes and corridor entry without monoliths.
+- Raised `ProjectCard` mobile bottom clearance (`bottom-20`) and `VoidPanels` bottom padding (`pb-24 sm:pb-28`) so overlays clear the bottom floating navbar.
+- Updated `AGENTS.md` approved dependencies list and `README.md` with navigation, icon, and React Bits license/credit documentation.
+
+### Removed
+
+- Monoliths component and configuration (`src/components/scene/landscape/Monoliths.tsx` and `monoliths` / `MonolithSpec` in `src/config/landscape.ts`).
+- Legacy top-left zone label and bottom-left `SCROLL 000%` HUD (`src/components/ui/Hud.tsx`, `JourneyZone.label` in `src/config/journey.ts`, and `landscapeConfig.scrollHint` in `src/config/landscape.ts`).
+- Intro `SKIP` button (`introConfig.skipLabel` and `handleSkip`).
+
 ## [0.10.0] - 2026-11-18
 
 ### Added

@@ -1,3 +1,4 @@
+import { ArrowUpRightIcon } from "@phosphor-icons/react/dist/ssr/ArrowUpRight";
 import Image from "next/image";
 import { aboutConfig } from "@/config/about";
 import { contactConfig } from "@/config/contact";
@@ -83,9 +84,15 @@ export default function FallbackView() {
                         href={item.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={OUTLINED_BUTTON_CLASS}
+                        className={`${OUTLINED_BUTTON_CLASS} gap-1.5`}
                       >
-                        VIEW PROJECT
+                        <span>VIEW PROJECT</span>
+                        <ArrowUpRightIcon
+                          size={14}
+                          weight="regular"
+                          aria-hidden="true"
+                          className="shrink-0"
+                        />
                       </a>
                     </div>
                   ) : null}
@@ -109,12 +116,15 @@ export default function FallbackView() {
                   className={CONTACT_ROW_LINK_CLASS}
                 >
                   <span className={CONTACT_ROW_LABEL_CLASS}>{item.label}</span>
-                  <span className="flex min-w-0 items-baseline gap-1.5">
+                  <span className="flex min-w-0 items-center gap-1.5">
                     <span className={CONTACT_ROW_VALUE_CLASS}>{item.text}</span>
                     {item.external ? (
-                      <span aria-hidden="true" className={CONTACT_ROW_ARROW_CLASS}>
-                        ↗
-                      </span>
+                      <ArrowUpRightIcon
+                        size={14}
+                        weight="regular"
+                        aria-hidden="true"
+                        className={CONTACT_ROW_ARROW_CLASS}
+                      />
                     ) : null}
                   </span>
                 </a>

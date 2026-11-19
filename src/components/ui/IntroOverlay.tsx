@@ -1,5 +1,6 @@
 "use client";
 
+import { MouseScrollIcon } from "@phosphor-icons/react/dist/ssr/MouseScroll";
 import {
   type RefObject,
   useCallback,
@@ -57,7 +58,6 @@ export default function IntroOverlay({
   const [dissolveProgress, setDissolveProgress] = useState(0);
 
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
-  const skipQueuedRef = useRef(false);
 
   const assetsReady = fontsReady && sceneReady;
 
@@ -78,18 +78,6 @@ export default function IntroOverlay({
       return "dissolving";
     });
   }, [thresholdBiasRef]);
-
-  const handleSkip = useCallback(() => {
-    if (!assetsReady) {
-      skipQueuedRef.current = true;
-      return;
-    }
-    if (phase === "reduced") {
-      enterImmediate();
-      return;
-    }
-    beginDissolve();
-  }, [assetsReady, phase, enterImmediate, beginDissolve]);
 
   // Check sessionStorage, ?intro=1 override, reduced-motion preference, and font readiness.
   useEffect(() => {
@@ -192,23 +180,13 @@ export default function IntroOverlay({
     if (!assetsReady) return;
 
     const rafId = requestAnimationFrame(() => {
-      if (skipQueuedRef.current) {
-        skipQueuedRef.current = false;
-        if (phase === "reduced") {
-          enterImmediate();
-        } else if (phase === "revealing" || phase === "ready") {
-          beginDissolve();
-        }
-        return;
-      }
-
       if (phase === "revealing" && revealComplete) {
         setPhase("ready");
       }
     });
 
     return () => cancelAnimationFrame(rafId);
-  }, [assetsReady, phase, revealComplete, enterImmediate, beginDissolve]);
+  }, [assetsReady, phase, revealComplete]);
 
   // 1.5-second Bayer dissolve out of intro and into the 3D world.
   useEffect(() => {
@@ -316,20 +294,14 @@ export default function IntroOverlay({
             fontsReady={fontsReady}
           />
 
-          {!isDissolving && (
-            <div className="fixed top-6 right-6 z-10">
-              <OutlinedButton
-                label={introConfig.skipLabel}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  handleSkip();
-                }}
-              />
-            </div>
-          )}
-
           {isReady && (
-            <div className="pointer-events-none fixed inset-x-0 bottom-14 z-10 flex justify-center px-6">
+            <div className="pointer-events-none fixed inset-x-0 bottom-12 z-10 flex flex-col items-center gap-2 px-6">
+              <MouseScrollIcon
+                size={22}
+                weight="light"
+                aria-hidden="true"
+                className="text-ink motion-safe:animate-scroll-bob"
+              />
               <button
                 type="button"
                 onClick={(event) => {

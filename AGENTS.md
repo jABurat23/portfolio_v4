@@ -15,6 +15,7 @@ Standing project rules for the **AGUSTIN** portfolio. All future work must follo
   - `@react-three/drei`
   - `gsap` (includes `ScrollTrigger`)
   - `lenis`
+  - `@phosphor-icons/react`
   - `eslint` (dev-only)
   - `eslint-config-next` (dev-only)
 - Never add any other dependency. If another package would help, propose it in the report instead of installing it.

@@ -51,6 +51,22 @@
   animation: gentle-pulse 2.8s ease-in-out infinite;
 }
 
+@keyframes scroll-bob {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: translate3d(0, -3px, 0);
+  }
+  50% {
+    opacity: 1;
+    transform: translate3d(0, 3px, 0);
+  }
+}
+
+.animate-scroll-bob {
+  animation: scroll-bob 2.6s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
