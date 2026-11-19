@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-11-18
+
+### Added
+
+- Crisp HTML `ProjectCard` overlay (`src/components/ui/ProjectCard.tsx`) during corridor dwell on the opposite side of the active 3D frame on desktop and docked cleanly above the bottom HUD on narrow portrait screens, with local `/public/works/` image support, fixed aspect ratio, `"COMING SOON"` placeholder, `"VIEW PROJECT"` external link, and `inert`/`aria-hidden` focus gating.
+- Optional `description` field and `card` focus/fade timing parameters (`focusHalfWindowSegments`, `plateauRatio`, `activeThreshold`) in `src/config/works.ts`.
+- WebGL capability detection (`src/lib/webgl.ts`), error boundary (`src/components/ui/WebGLErrorBoundary.tsx`), `webglcontextlost`/`webglcontextcreationerror` handling in `SceneCanvas`, dynamic client-only loading of `InteractiveWorld` (`src/components/ui/InteractiveWorld.tsx`), and static zero-3D `FallbackView` (`src/components/ui/FallbackView.tsx`) testable via `?fallback=1`.
+- Adaptive quality tier system (`src/config/quality.ts`, `src/lib/quality.ts`, `src/components/scene/QualityController.tsx`) monitoring post-intro/post-warmup rolling FPS, stepping down tiers (`0 -> 1 -> 2`) without Canvas remounts or React re-render storms while disposing shadow maps properly, persisting per-session in `sessionStorage`, and testable via `?quality=0|1|2`.
+- Styled `404` (`src/app/not-found.tsx`), route error (`src/app/error.tsx`), and minimal inline-styled root `global-error.tsx` (`src/app/global-error.tsx`) pages.
+- Consistent interactive hover, active/touch press, and `1px` `focus-visible` states (`>= 44px` tap height, full-row contact links with `↗` external indicator, reduced-motion instant transitions) centralized in `src/lib/interactive.ts` and `src/components/ui/OutlinedButton.tsx`.
+
+### Changed
+
+- Reworked the `DitherText` intro reveal (`src/config/intro.ts`, `src/components/ui/DitherText.tsx`) to a calm 4-second halo-bounded deterministic Bayer speckle pattern that only turns on monotonically before condensing into crisp `"AGUSTIN"` text with zero shimmer outside the letter area.
+- Removed the legacy bottom-center corridor caption chip from `src/components/ui/Hud.tsx` (replaced by `ProjectCard`).
+- Updated `README.md` with project card / `/public/works/` instructions, intro & quality tuning guides, and `?intro=1`, `?fallback=1`, `?quality=0..2` query parameters.
+
 ## [0.9.0] - 2026-11-18
 
 First deployable preview release.

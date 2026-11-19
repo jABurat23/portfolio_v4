@@ -1,26 +1,41 @@
 "use client";
 
 import { Canvas } from "@react-three/fiber";
-import { type RefObject, useEffect, useState } from "react";
+import { type RefObject, useEffect, useMemo, useRef, useState } from "react";
 import { PCFShadowMap } from "three";
-import { ditherConfig } from "@/config/dither";
 import { landscapeConfig } from "@/config/landscape";
+import { getQualityTierSpec, resolveInitialQuality } from "@/lib/quality";
 import CameraRig from "./CameraRig";
 import CorridorScene from "./corridor/CorridorScene";
 import DitherPass from "./DitherPass";
 import LandscapeScene from "./landscape/LandscapeScene";
+import QualityController from "./QualityController";
 import VoidScene from "./void/VoidScene";
 
 export interface SceneCanvasProps {
   onReady?: () => void;
+  onContextLost?: () => void;
   thresholdBiasRef?: RefObject<number>;
+  introDone?: boolean;
 }
 
 export default function SceneCanvas({
   onReady,
+  onContextLost,
   thresholdBiasRef,
+  introDone = false,
 }: SceneCanvasProps) {
   const [isTabVisible, setIsTabVisible] = useState(true);
+  const canvasElRef = useRef<HTMLCanvasElement | null>(null);
+  const contextLostHandlerRef = useRef<((event: Event) => void) | null>(null);
+  const onContextLostRef = useRef(onContextLost);
+
+  const initialQuality = useMemo(() => resolveInitialQuality(), []);
+  const initialTierSpec = getQualityTierSpec(initialQuality.tier);
+
+  useEffect(() => {
+    onContextLostRef.current = onContextLost;
+  }, [onContextLost]);
 
   useEffect(() => {
     const handleVisibilityChange = () => {
@@ -32,13 +47,24 @@ export default function SceneCanvas({
     return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
   }, []);
 
+  useEffect(() => {
+    return () => {
+      const el = canvasElRef.current;
+      const handler = contextLostHandlerRef.current;
+      if (el && handler) {
+        el.removeEventListener("webglcontextlost", handler);
+        el.removeEventListener("webglcontextcreationerror", handler);
+      }
+    };
+  }, []);
+
   const [camX, camY, camZ] = landscapeConfig.camera.position;
 
   return (
     <Canvas
       aria-hidden="true"
-      shadows={{ type: PCFShadowMap }}
-      dpr={[1, ditherConfig.maxDpr]}
+      shadows={initialTierSpec.shadowsEnabled ? { type: PCFShadowMap } : false}
+      dpr={[1, initialTierSpec.maxDpr]}
       frameloop={isTabVisible ? "always" : "never"}
       camera={{
         position: [camX, camY, camZ],
@@ -48,14 +74,32 @@ export default function SceneCanvas({
       }}
       className="h-full w-full"
       onCreated={({ gl }) => {
-        gl.domElement.setAttribute("aria-hidden", "true");
+        const dom = gl.domElement;
+        canvasElRef.current = dom;
+        dom.setAttribute("aria-hidden", "true");
+        const handleContextLost = (event: Event) => {
+          event.preventDefault();
+          onContextLostRef.current?.();
+        };
+        contextLostHandlerRef.current = handleContextLost;
+        dom.addEventListener("webglcontextlost", handleContextLost);
+        dom.addEventListener("webglcontextcreationerror", handleContextLost);
         onReady?.();
       }}
     >
       <CameraRig />
-      <LandscapeScene />
+      <LandscapeScene
+        initialShadowsEnabled={initialTierSpec.shadowsEnabled}
+        initialShadowMapSize={initialTierSpec.shadowMapSize}
+      />
       <CorridorScene />
       <VoidScene />
+      <QualityController
+        initialTier={initialQuality.tier}
+        forced={initialQuality.forced}
+        monitoringEnabled={introDone}
+        isTabVisible={isTabVisible}
+      />
       <DitherPass thresholdBiasRef={thresholdBiasRef} />
     </Canvas>
   );

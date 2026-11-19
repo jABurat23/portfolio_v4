@@ -8,6 +8,7 @@ import {
   useState,
 } from "react";
 import { introConfig } from "@/config/intro";
+import { SCROLL_PROMPT_CLASS } from "@/lib/interactive";
 import DitherText from "./DitherText";
 import { OutlinedButton } from "./OutlinedButton";
 
@@ -163,7 +164,7 @@ export default function IntroOverlay({
     };
   }, [phase, onComplete]);
 
-  // 3-second gradual Bayer reveal; always plays in full regardless of asset load speed.
+  // Gradual Bayer reveal configured by introConfig.revealDurationMs; always plays in full regardless of asset load speed.
   useEffect(() => {
     if (phase !== "revealing") return;
 
@@ -335,7 +336,7 @@ export default function IntroOverlay({
                   event.stopPropagation();
                   beginDissolve();
                 }}
-                className="pointer-events-auto font-mono text-xs tracking-[0.25em] text-ink uppercase animate-gentle-pulse focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-ink"
+                className={SCROLL_PROMPT_CLASS}
               >
                 {introConfig.promptText}
               </button>

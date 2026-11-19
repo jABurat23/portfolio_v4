@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { type BayerMatrixSize, ditherConfig } from "@/config/dither";
+import { introConfig } from "@/config/intro";
 import { bayerThreshold } from "@/lib/bayer";
 
 export type DitherTextMode = "reveal" | "dissolve" | "static";
@@ -15,6 +16,9 @@ export interface DitherTextProps {
   pixelSize?: number;
   backgroundColor?: string;
   inkColor?: string;
+  haloRadiusCells?: number;
+  startSpeckleDensity?: number;
+  maxSpeckleDensity?: number;
 }
 
 interface RgbColor {
@@ -29,6 +33,7 @@ interface GridCache {
   mask: Float32Array;
   noise: Float32Array;
   bayer: Float32Array;
+  distance: Float32Array;
   imageData: ImageData;
 }
 
@@ -52,12 +57,57 @@ function clamp01(value: number): number {
   return Math.max(0, Math.min(1, value));
 }
 
+function computeDistanceField(
+  mask: Float32Array,
+  cols: number,
+  rows: number,
+  maxRadius: number,
+): Float32Array {
+  const total = cols * rows;
+  const dist = new Float32Array(total);
+  const inf = maxRadius + 1;
+  dist.fill(inf);
+
+  for (let y = 0; y < rows; y += 1) {
+    for (let x = 0; x < cols; x += 1) {
+      const idx = y * cols + x;
+      if (mask[idx] >= 0.35) {
+        dist[idx] = 0;
+        continue;
+      }
+      if (x > 0) dist[idx] = Math.min(dist[idx], dist[idx - 1] + 1);
+      if (y > 0) {
+        const up = idx - cols;
+        dist[idx] = Math.min(dist[idx], dist[up] + 1);
+        if (x > 0) dist[idx] = Math.min(dist[idx], dist[up - 1] + 1.414);
+        if (x + 1 < cols) dist[idx] = Math.min(dist[idx], dist[up + 1] + 1.414);
+      }
+    }
+  }
+
+  for (let y = rows - 1; y >= 0; y -= 1) {
+    for (let x = cols - 1; x >= 0; x -= 1) {
+      const idx = y * cols + x;
+      if (x + 1 < cols) dist[idx] = Math.min(dist[idx], dist[idx + 1] + 1);
+      if (y + 1 < rows) {
+        const down = idx + cols;
+        dist[idx] = Math.min(dist[idx], dist[down] + 1);
+        if (x > 0) dist[idx] = Math.min(dist[idx], dist[down - 1] + 1.414);
+        if (x + 1 < cols) dist[idx] = Math.min(dist[idx], dist[down + 1] + 1.414);
+      }
+    }
+  }
+
+  return dist;
+}
+
 function buildGridCache(
   cols: number,
   rows: number,
   text: string,
   fontFamily: string,
   matrixSize: BayerMatrixSize,
+  haloRadiusCells: number,
 ): GridCache {
   const total = cols * rows;
   const mask = new Float32Array(total);
@@ -98,12 +148,15 @@ function buildGridCache(
     }
   }
 
+  const distance = computeDistanceField(mask, cols, rows, haloRadiusCells);
+
   return {
     cols,
     rows,
     mask,
     noise,
     bayer,
+    distance,
     imageData: new ImageData(cols, rows),
   };
 }
@@ -117,6 +170,9 @@ export default function DitherText({
   pixelSize = ditherConfig.pixelSize,
   backgroundColor = ditherConfig.backgroundColor,
   inkColor = ditherConfig.inkColor,
+  haloRadiusCells = introConfig.revealHaloRadiusCells,
+  startSpeckleDensity = introConfig.startSpeckleDensity,
+  maxSpeckleDensity = introConfig.maxSpeckleDensity,
 }: DitherTextProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -156,8 +212,23 @@ export default function DitherText({
 
     canvas.width = cols;
     canvas.height = rows;
-    gridCacheRef.current = buildGridCache(cols, rows, text, fontFamily, matrixSize);
-  }, [viewport.width, viewport.height, text, pixelSize, matrixSize, fontsReady]);
+    gridCacheRef.current = buildGridCache(
+      cols,
+      rows,
+      text,
+      fontFamily,
+      matrixSize,
+      haloRadiusCells,
+    );
+  }, [
+    viewport.width,
+    viewport.height,
+    text,
+    pixelSize,
+    matrixSize,
+    haloRadiusCells,
+    fontsReady,
+  ]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -169,7 +240,7 @@ export default function DitherText({
 
     const bg = parseHexRgb(backgroundColor);
     const ink = parseHexRgb(inkColor);
-    const { cols, rows, mask, noise, bayer, imageData } = cache;
+    const { cols, rows, mask, noise, bayer, distance, imageData } = cache;
     const data = imageData.data;
     const p = clamp01(progress);
 
@@ -187,29 +258,45 @@ export default function DitherText({
     }
 
     if (mode === "reveal") {
-      // Gradual pacing over the full duration: pure black -> Bayer noise -> crisp text.
-      const ambientEnvelope =
-        p < 0.86 ? Math.sin((p / 0.86) * Math.PI) * 0.44 : 0;
-      const glyphP = clamp01((p - 0.14) / 0.86);
-      const glyphEase = glyphP * glyphP * (3 - 2 * glyphP);
-      const settleP = clamp01((p - 0.84) / 0.16);
+      // Pure black frame at p=0; deterministic monotonic halo speckle grows calmly and condenses into crisp glyphs.
+      const startDensity = clamp01(startSpeckleDensity);
+      const peakDensity = Math.max(startDensity, clamp01(maxSpeckleDensity));
+      const radius = Math.max(1, haloRadiusCells);
+
+      const fadeInLead = clamp01(p / 0.04);
+      const speckleRise = clamp01(p / 0.72);
+      const haloDensity =
+        fadeInLead *
+        (startDensity + (peakDensity - startDensity) * (speckleRise * speckleRise));
+
+      const glyphCurve = clamp01(p / 0.92);
+      const glyphDensity =
+        fadeInLead *
+        (startDensity + (1 - startDensity) * Math.pow(glyphCurve, 1.55));
+
+      const condense = clamp01((p - 0.72) / 0.26);
+      const condenseEase = condense * condense * (3 - 2 * condense);
 
       for (let i = 0; i < cols * rows; i += 1) {
         const m = mask[i];
-        const n = noise[i];
-        const threshold = bayer[i];
-
+        const crisp = m >= 0.45;
+        const dist = distance[i];
         let isInk = false;
-        if (settleP >= 1) {
-          isInk = m >= 0.45;
-        } else {
-          const bgSignal = ambientEnvelope * n;
-          const glyphNoise = (1 - glyphEase) * 0.25 * n;
-          const glyphSignal = m * (glyphEase * 1.12) + (m > 0.05 ? glyphNoise * Math.min(1, p * 4) : 0);
-          const luma = Math.max(bgSignal, glyphSignal);
-          const dithered = luma > 0 && luma >= threshold;
-          const crisp = m >= 0.45;
-          isInk = settleP > 0 ? (settleP > n ? crisp : dithered) : dithered;
+
+        if (p >= 1) {
+          isInk = crisp;
+        } else if (crisp) {
+          const rank = bayer[i] * 0.65 + noise[i] * 0.35;
+          isInk = p >= 0.96 || glyphDensity >= rank;
+        } else if (dist <= radius) {
+          const proximity = 1 - dist / radius;
+          const rank = bayer[i] * 0.55 + noise[i] * 0.45;
+          const spatialThreshold = rank / (0.25 + 0.75 * proximity);
+          const turnedOn = haloDensity >= spatialThreshold;
+          const clearedByCondense =
+            condenseEase > 0 &&
+            (1 - proximity) * 0.7 + rank * 0.3 <= condenseEase;
+          isInk = turnedOn && !clearedByCondense;
         }
 
         const offset = i * 4;
@@ -243,6 +330,9 @@ export default function DitherText({
     progress,
     backgroundColor,
     inkColor,
+    haloRadiusCells,
+    startSpeckleDensity,
+    maxSpeckleDensity,
     viewport.width,
     viewport.height,
     fontsReady,

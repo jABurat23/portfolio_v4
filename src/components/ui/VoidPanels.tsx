@@ -5,6 +5,12 @@ import { aboutConfig } from "@/config/about";
 import { contactConfig } from "@/config/contact";
 import { getVoidPanelsState } from "@/config/journey";
 import {
+  CONTACT_ROW_ARROW_CLASS,
+  CONTACT_ROW_LABEL_CLASS,
+  CONTACT_ROW_LINK_CLASS,
+  CONTACT_ROW_VALUE_CLASS,
+} from "@/lib/interactive";
+import {
   getScrollProgress,
   scrollToTop,
   subscribeScrollProgress,
@@ -89,19 +95,22 @@ export default function VoidPanels({ visible }: VoidPanelsProps) {
           <AsciiFrame label={contactConfig.label}>
             <ul className="flex flex-col divide-y divide-line">
               {contactConfig.items.map((item) => (
-                <li key={item.id} className="py-2.5 first:pt-0 last:pb-0">
+                <li key={item.id}>
                   <a
                     href={item.href}
                     {...(item.external
                       ? { target: "_blank", rel: "noopener noreferrer" }
                       : {})}
-                    className="group flex items-baseline justify-between gap-4 py-0.5 text-ink transition-colors hover:text-ink focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-ink"
+                    className={CONTACT_ROW_LINK_CLASS}
                   >
-                    <span className="shrink-0 font-mono text-xs tracking-[0.2em] text-muted uppercase transition-colors group-hover:text-ink group-focus-visible:text-ink">
-                      {item.label}
-                    </span>
-                    <span className="truncate font-mono text-xs tracking-wider text-ink underline-offset-4 group-hover:underline group-focus-visible:underline sm:text-sm">
-                      {item.text}
+                    <span className={CONTACT_ROW_LABEL_CLASS}>{item.label}</span>
+                    <span className="flex min-w-0 items-baseline gap-1.5">
+                      <span className={CONTACT_ROW_VALUE_CLASS}>{item.text}</span>
+                      {item.external ? (
+                        <span aria-hidden="true" className={CONTACT_ROW_ARROW_CLASS}>
+                          ↗
+                        </span>
+                      ) : null}
                     </span>
                   </a>
                 </li>

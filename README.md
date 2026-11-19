@@ -51,6 +51,17 @@ The site is a static-capable Next.js App Router portfolio with zero required run
 3. Keep the automatically detected **Next.js** framework settings (Build Command `npm run build`, Output Directory `.next`, Install Command `npm ci` / `npm install`).
 4. Leave Environment Variables empty and click **Deploy** to publish a preview deployment.
 
+## Test Query Parameters
+
+- `?intro=1` — Replay the Bayer intro sequence even if it has already played in the current browser session.
+- `?fallback=1` — Force the static zero-3D fallback page (skips downloading Three.js, React Three Fiber, GSAP, and Lenis bundles).
+- `?quality=0`, `?quality=1`, or `?quality=2` — Force a specific rendering quality tier (disables automatic FPS step-down for the load).
+
+## Intro & Adaptive Quality Settings
+
+- **Intro tuning:** edit `src/config/intro.ts` (`revealDurationMs`, `revealHaloRadiusCells`, `startSpeckleDensity`, `maxSpeckleDensity`, `dissolveDurationMs`).
+- **Quality tiers:** edit `src/config/quality.ts` (`tiers` for DPR cap and shadow map size/toggle, plus `warmupMs`, `sampleWindowMs`, `fpsThreshold`, `consecutiveLowSamplesRequired`, and `cooldownMs`). The chosen tier persists per browser session in `sessionStorage`.
+
 ## Adding a Journey Zone
 
 All scroll zones, lengths, HUD labels, and camera waypoints live in `src/config/journey.ts`. To append a new zone (for example Corridor or Void):
@@ -58,12 +69,17 @@ All scroll zones, lengths, HUD labels, and camera waypoints live in `src/config/
 1. Add a new object to `journeyConfig.zones` with a unique `id`, a mono HUD `label` (e.g. `"[ 02 / CORRIDOR ]"`), its scroll distance `scrollVh` (in `svh` units), and an ordered list of `{ position, target }` camera waypoints.
 2. The scroll spacer height (`getTotalJourneyVh()`), active HUD zone lookup (`getZoneAtProgress()`), and continuous `CatmullRomCurve3` camera path in `CameraRig` update automatically from config.
 
-## Adding a Project Frame
+## Adding a Project
 
-All Corridor project entries and frame layout parameters live in `src/config/works.ts`. To add or edit a frame:
+All Corridor project entries, card focus timing, and frame layout parameters live in `src/config/works.ts`. To add or edit a project:
 
-1. Append an object to `worksConfig.items` with a unique `id`, a `title`, a `caption`, and optional `image` / `url` fields.
-2. Corridor frame placements (`CorridorScene`), alternating left/right camera waypoints (`buildCorridorWaypoints()`), Corridor scroll length (`items.length * vhPerFrame`), terrain length (`DuneTerrain`), HUD caption chip updates, and the screen-reader works list update automatically from config.
+1. Append or update an object in `worksConfig.items` with:
+   - `id` (unique string) and `title` (required)
+   - `caption` (short uppercase status/tagline shown when `description` is omitted)
+   - `description` (optional body copy shown in the HTML card and fallback view)
+   - `image` (optional local path under `/public/works/`, written as `"/works/filename.png"`; external image URLs are ignored)
+   - `url` (optional external link rendering the `"VIEW PROJECT"` outlined button)
+2. Corridor frame placements (`CorridorScene`), alternating left/right camera waypoints (`buildCorridorWaypoints()`), Corridor scroll length (`items.length * vhPerFrame`), terrain length (`DuneTerrain`), crisp HTML cards (`ProjectCard`), static fallback works list (`FallbackView`), and the screen-reader works list update automatically from config.
 
 ## Editing About and Contact
 

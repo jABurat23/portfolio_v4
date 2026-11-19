@@ -7,7 +7,15 @@ import { landscapeConfig } from "@/config/landscape";
 import DuneTerrain from "./DuneTerrain";
 import Monoliths from "./Monoliths";
 
-export default function LandscapeScene() {
+export interface LandscapeSceneProps {
+  initialShadowsEnabled?: boolean;
+  initialShadowMapSize?: number;
+}
+
+export default function LandscapeScene({
+  initialShadowsEnabled = true,
+  initialShadowMapSize = landscapeConfig.light.shadowMapSize,
+}: LandscapeSceneProps) {
   const { scene, camera } = useThree();
   const lightRef = useRef<DirectionalLight>(null);
 
@@ -57,8 +65,11 @@ export default function LandscapeScene() {
         position={[light.position[0], light.position[1], light.position[2]]}
         intensity={light.intensity}
         color={light.color}
-        castShadow
-        shadow-mapSize={[light.shadowMapSize, light.shadowMapSize]}
+        castShadow={initialShadowsEnabled}
+        shadow-mapSize={[
+          initialShadowMapSize || landscapeConfig.light.shadowMapSize,
+          initialShadowMapSize || landscapeConfig.light.shadowMapSize,
+        ]}
         shadow-camera-left={-light.shadowFrustum}
         shadow-camera-right={light.shadowFrustum}
         shadow-camera-top={light.shadowFrustum}

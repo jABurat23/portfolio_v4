@@ -1,5 +1,5 @@
 import { voidConfig } from "@/config/void";
-import { getCorridorEndZ, worksConfig } from "@/config/works";
+import { getCorridorEndZ, type WorkItem, worksConfig } from "@/config/works";
 
 export interface JourneyWaypoint {
   position: readonly [number, number, number];
@@ -41,9 +41,10 @@ export interface ActiveZoneInfo {
 
 export interface CorridorFrameFocus {
   index: number;
-  title: string;
-  caption: string;
+  item: WorkItem;
+  side: "left" | "right";
   opacity: number;
+  active: boolean;
 }
 
 function buildCorridorWaypoints(): JourneyWaypoint[] {
@@ -253,7 +254,9 @@ export function getCorridorFrameFocus(
 
   const remapped = remapCorridorProgress(info.localProgress);
   const segments = items.length + 2;
-  const halfWindow = 0.5 / segments;
+  const { focusHalfWindowSegments, plateauRatio, activeThreshold } =
+    worksConfig.card;
+  const halfWindow = focusHalfWindowSegments / segments;
 
   let closestIdx = 0;
   let closestDist = Infinity;
@@ -266,15 +269,22 @@ export function getCorridorFrameFocus(
     }
   }
 
-  const ratio = Math.min(1, closestDist / halfWindow);
-  const opacity = Math.max(0, 1 - ratio * ratio);
+  const ratio = Math.min(1, closestDist / Math.max(0.0001, halfWindow));
+  let opacity = 1;
+  if (ratio > plateauRatio) {
+    const t = (ratio - plateauRatio) / Math.max(0.0001, 1 - plateauRatio);
+    opacity = Math.max(0, 1 - t * t * (3 - 2 * t));
+  }
+
   const item = items[closestIdx];
+  const side: "left" | "right" = closestIdx % 2 === 0 ? "left" : "right";
 
   return {
     index: closestIdx,
-    title: item.title,
-    caption: item.caption,
+    item,
+    side,
     opacity,
+    active: opacity >= activeThreshold,
   };
 }
 
