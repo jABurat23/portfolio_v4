@@ -12,6 +12,9 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
 
   return (
     <html lang="en">
+      <head>
+        <title>Something went wrong | Agustin</title>
+      </head>
       <body
         style={{
           margin: 0,
@@ -29,7 +32,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
           style={{
             width: "100%",
             maxWidth: "512px",
-            border: "1px solid #2A2A2A",
+            border: "1px solid #4A4A4A",
             backgroundColor: "#0A0A0A",
             padding: "20px",
             boxSizing: "border-box",
@@ -64,11 +67,11 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
               style={{
                 minHeight: "44px",
                 padding: "8px 16px",
-                border: "1px solid #2A2A2A",
+                border: "1px solid #4A4A4A",
                 backgroundColor: "#0A0A0A",
                 color: "#F2F2F2",
                 fontFamily: "inherit",
-                fontSize: "12px",
+                fontSize: "13px",
                 letterSpacing: "0.12em",
                 textTransform: "uppercase",
                 cursor: "pointer",
@@ -83,11 +86,11 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
                 alignItems: "center",
                 minHeight: "44px",
                 padding: "8px 16px",
-                border: "1px solid #2A2A2A",
+                border: "1px solid #4A4A4A",
                 backgroundColor: "#0A0A0A",
                 color: "#F2F2F2",
                 fontFamily: "inherit",
-                fontSize: "12px",
+                fontSize: "13px",
                 letterSpacing: "0.12em",
                 textDecoration: "none",
                 textTransform: "uppercase",

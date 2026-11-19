@@ -1,7 +1,13 @@
 "use client";
 
 import { ArrowUpRightIcon } from "@phosphor-icons/react/dist/ssr/ArrowUpRight";
-import { type MouseEvent, useCallback, useEffect, useRef } from "react";
+import {
+  type MouseEvent,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+} from "react";
 import { aboutConfig } from "@/config/about";
 import { contactConfig } from "@/config/contact";
 import { getVoidPanelsState } from "@/config/journey";
@@ -19,8 +25,14 @@ import {
 import { AsciiFrame } from "./AsciiFrame";
 import { OutlinedButton } from "./OutlinedButton";
 
+export interface ActiveVoidPanels {
+  about: boolean;
+  contact: boolean;
+}
+
 export interface VoidPanelsProps {
   visible: boolean;
+  onActivePanelsChange?: (panels: ActiveVoidPanels) => void;
 }
 
 function applyPanelState(
@@ -30,36 +42,62 @@ function applyPanelState(
 ): void {
   if (!element) return;
   element.style.opacity = opacity.toFixed(3);
+  element.style.visibility = opacity <= 0.001 ? "hidden" : "visible";
   element.style.pointerEvents = active ? "auto" : "none";
   element.inert = !active;
-  element.setAttribute("aria-hidden", active ? "false" : "true");
 }
 
-export default function VoidPanels({ visible }: VoidPanelsProps) {
+export default function VoidPanels({
+  visible,
+  onActivePanelsChange,
+}: VoidPanelsProps) {
   const aboutRef = useRef<HTMLDivElement>(null);
   const contactRef = useRef<HTMLDivElement>(null);
   const backWrapRef = useRef<HTMLDivElement>(null);
   const visibleRef = useRef(visible);
-
-  const syncPanels = useCallback((progress: number) => {
-    if (!visibleRef.current) {
-      applyPanelState(aboutRef.current, 0, false);
-      applyPanelState(contactRef.current, 0, false);
-      applyPanelState(backWrapRef.current, 0, false);
-      return;
-    }
-
-    const state = getVoidPanelsState(progress);
-    applyPanelState(aboutRef.current, state.aboutOpacity, state.aboutActive);
-    applyPanelState(contactRef.current, state.contactOpacity, state.contactActive);
-    applyPanelState(
-      backWrapRef.current,
-      state.backButtonOpacity,
-      state.backButtonActive,
-    );
-  }, []);
+  const exposedPanelsRef = useRef<ActiveVoidPanels>({
+    about: false,
+    contact: false,
+  });
+  const onActivePanelsChangeRef = useRef(onActivePanelsChange);
 
   useEffect(() => {
+    onActivePanelsChangeRef.current = onActivePanelsChange;
+  }, [onActivePanelsChange]);
+
+  const emitExposedPanels = useCallback((about: boolean, contact: boolean) => {
+    const prev = exposedPanelsRef.current;
+    if (prev.about !== about || prev.contact !== contact) {
+      const next = { about, contact };
+      exposedPanelsRef.current = next;
+      onActivePanelsChangeRef.current?.(next);
+    }
+  }, []);
+
+  const syncPanels = useCallback(
+    (progress: number) => {
+      if (!visibleRef.current) {
+        applyPanelState(aboutRef.current, 0, false);
+        applyPanelState(contactRef.current, 0, false);
+        applyPanelState(backWrapRef.current, 0, false);
+        emitExposedPanels(false, false);
+        return;
+      }
+
+      const state = getVoidPanelsState(progress);
+      applyPanelState(aboutRef.current, state.aboutOpacity, state.aboutActive);
+      applyPanelState(contactRef.current, state.contactOpacity, state.contactActive);
+      applyPanelState(
+        backWrapRef.current,
+        state.backButtonOpacity,
+        state.backButtonActive,
+      );
+      emitExposedPanels(state.aboutActive, state.contactActive);
+    },
+    [emitExposedPanels],
+  );
+
+  useLayoutEffect(() => {
     visibleRef.current = visible;
     syncPanels(getScrollProgress());
   }, [visible, syncPanels]);
@@ -80,7 +118,7 @@ export default function VoidPanels({ visible }: VoidPanelsProps) {
       className="pointer-events-none fixed inset-0 z-20 flex h-dvh items-center justify-center px-5 pt-10 pb-24 sm:px-10 sm:pt-12 sm:pb-28"
     >
       <div className="relative flex w-full max-w-lg items-center justify-center">
-        <div ref={aboutRef} aria-hidden="true" className="w-full opacity-0">
+        <div ref={aboutRef} className="invisible w-full opacity-0">
           <AsciiFrame label={aboutConfig.label}>
             <p className="font-sans text-sm leading-relaxed text-ink sm:text-base">
               {aboutConfig.body}
@@ -90,8 +128,7 @@ export default function VoidPanels({ visible }: VoidPanelsProps) {
 
         <div
           ref={contactRef}
-          aria-hidden="true"
-          className="absolute inset-x-0 w-full opacity-0"
+          className="invisible absolute inset-x-0 w-full opacity-0"
         >
           <AsciiFrame label={contactConfig.label}>
             <ul className="flex flex-col divide-y divide-line">
@@ -124,8 +161,7 @@ export default function VoidPanels({ visible }: VoidPanelsProps) {
 
           <div
             ref={backWrapRef}
-            aria-hidden="true"
-            className="mt-4 flex justify-center opacity-0"
+            className="invisible mt-4 flex justify-center opacity-0"
           >
             <OutlinedButton
               label={contactConfig.backToStartLabel}

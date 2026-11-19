@@ -89,6 +89,15 @@ export const navConfig: NavConfig = {
   ],
 };
 
+export function getNavTargetProgressForHash(hash: string): number | null {
+  const normalized = hash.trim().toLowerCase();
+  if (!normalized.startsWith("#")) return null;
+  const entry = navConfig.items.find(
+    (item) => item.href.toLowerCase() === normalized,
+  );
+  return entry ? entry.targetProgress : null;
+}
+
 export function getActiveNavHref(progress: number): string {
   const info = getZoneAtProgress(progress);
 

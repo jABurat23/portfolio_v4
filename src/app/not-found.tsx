@@ -1,6 +1,11 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { AsciiFrame } from "@/components/ui/AsciiFrame";
 import { OUTLINED_BUTTON_CLASS } from "@/lib/interactive";
+
+export const metadata: Metadata = {
+  title: "Page not found | Agustin",
+};
 
 export default function NotFound() {
   return (

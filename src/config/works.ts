@@ -80,9 +80,9 @@ export const worksConfig: WorksConfig = {
     dwellStrength: 0.38,
   },
   card: {
-    focusHalfWindowSegments: 0.5,
-    plateauRatio: 0.32,
-    activeThreshold: 0.25,
+    focusHalfWindowSegments: 0.48,
+    plateauRatio: 0.75,
+    activeThreshold: 0.5,
   },
 };
 

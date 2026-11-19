@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect } from "react";
 import { AsciiFrame } from "@/components/ui/AsciiFrame";
 import { OutlinedButton } from "@/components/ui/OutlinedButton";
 import { OUTLINED_BUTTON_CLASS } from "@/lib/interactive";
@@ -12,6 +13,10 @@ export interface ErrorPageProps {
 
 export default function ErrorPage({ error, reset }: ErrorPageProps) {
   void error;
+
+  useEffect(() => {
+    document.title = "Something went wrong | Agustin";
+  }, []);
 
   return (
     <main className="flex min-h-dvh w-full items-center justify-center bg-background px-6 py-12 text-ink">

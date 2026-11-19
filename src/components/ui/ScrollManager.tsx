@@ -11,6 +11,8 @@ export interface ScrollManagerProps {
   spacerRef: RefObject<HTMLDivElement | null>;
   introDone: boolean;
   introDidPlay: boolean;
+  initialTargetProgress?: number | null;
+  deferInitialScroll?: boolean;
 }
 
 function readWindowScrollProgress(spacer: HTMLElement): number {
@@ -22,10 +24,13 @@ export default function ScrollManager({
   spacerRef,
   introDone,
   introDidPlay,
+  initialTargetProgress = null,
+  deferInitialScroll = false,
 }: ScrollManagerProps) {
   const lenisRef = useRef<Lenis | null>(null);
   const triggerRef = useRef<ScrollTrigger | null>(null);
   const introDoneRef = useRef(introDone);
+  const appliedInitialTargetRef = useRef(false);
   const [reducedMotion, setReducedMotion] = useState(false);
 
   useEffect(() => {
@@ -89,10 +94,18 @@ export default function ScrollManager({
     }, spacerRef);
 
     ScrollTrigger.refresh();
-    const initial = triggerRef.current
-      ? triggerRef.current.progress
-      : readWindowScrollProgress(spacer);
-    setScrollProgress(initial);
+    if (
+      !introDoneRef.current &&
+      initialTargetProgress !== null &&
+      !deferInitialScroll
+    ) {
+      setScrollProgress(initialTargetProgress, { snap: true });
+    } else {
+      const initial = triggerRef.current
+        ? triggerRef.current.progress
+        : readWindowScrollProgress(spacer);
+      setScrollProgress(initial);
+    }
 
     const unregisterScrollToProgress = registerScrollToProgress((progress) => {
       const maxScroll = Math.max(0, spacer.offsetHeight - window.innerHeight);
@@ -118,7 +131,7 @@ export default function ScrollManager({
         }
       }
     };
-  }, [spacerRef, reducedMotion]);
+  }, [spacerRef, reducedMotion, initialTargetProgress, deferInitialScroll]);
 
   useEffect(() => {
     const lenis = lenisRef.current;
@@ -126,6 +139,23 @@ export default function ScrollManager({
 
     if (!introDone) {
       lenis?.stop();
+      return;
+    }
+
+    if (initialTargetProgress !== null && !appliedInitialTargetRef.current) {
+      appliedInitialTargetRef.current = true;
+      const targetTop = spacer
+        ? Math.round(
+            initialTargetProgress *
+              Math.max(0, spacer.offsetHeight - window.innerHeight),
+          )
+        : 0;
+      lenis?.start();
+      window.scrollTo(0, targetTop);
+      lenis?.scrollTo(targetTop, { immediate: true, force: true });
+      setScrollProgress(initialTargetProgress, { snap: true });
+      ScrollTrigger.refresh();
+      ScrollTrigger.update();
       return;
     }
 
@@ -144,7 +174,7 @@ export default function ScrollManager({
     }
 
     lenis?.start();
-  }, [introDone, introDidPlay, spacerRef, reducedMotion]);
+  }, [introDone, introDidPlay, initialTargetProgress, spacerRef, reducedMotion]);
 
   return null;
 }

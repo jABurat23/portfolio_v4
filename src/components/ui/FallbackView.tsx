@@ -1,5 +1,8 @@
+"use client";
+
 import { ArrowUpRightIcon } from "@phosphor-icons/react/dist/ssr/ArrowUpRight";
 import Image from "next/image";
+import { useEffect } from "react";
 import { aboutConfig } from "@/config/about";
 import { contactConfig } from "@/config/contact";
 import { siteConfig } from "@/config/site";
@@ -15,18 +18,34 @@ import { AsciiFrame } from "./AsciiFrame";
 import { resolveLocalWorkImage } from "./ProjectCard";
 
 export default function FallbackView() {
+  useEffect(() => {
+    document.title = "Agustin | Text view";
+    const hashId = window.location.hash.replace(/^#/, "").toLowerCase();
+    if (
+      hashId === "home" ||
+      hashId === "works" ||
+      hashId === "about" ||
+      hashId === "contact"
+    ) {
+      document.getElementById(hashId)?.scrollIntoView({ behavior: "auto" });
+    }
+  }, []);
+
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-2xl flex-col gap-8 px-6 py-12 sm:px-10 sm:py-16">
-      <header className="flex flex-col gap-3 border-b border-line pb-6">
+      <header
+        id="home"
+        className="flex scroll-mt-8 flex-col gap-3 border-b border-line pb-6"
+      >
         <h1 className="font-mono text-4xl font-bold tracking-[0.24em] text-ink uppercase sm:text-6xl">
           {siteConfig.name}
         </h1>
-        <p className="font-mono text-xs tracking-[0.2em] text-muted uppercase">
+        <p className="font-mono text-[13px] tracking-[0.18em] text-muted uppercase">
           3D VIEW UNAVAILABLE ON THIS DEVICE
         </p>
       </header>
 
-      <section aria-label={aboutConfig.label}>
+      <section id="about" aria-label={aboutConfig.label} className="scroll-mt-8">
         <AsciiFrame label={aboutConfig.label}>
           <p className="font-sans text-sm leading-relaxed text-ink sm:text-base">
             {aboutConfig.body}
@@ -34,7 +53,7 @@ export default function FallbackView() {
         </AsciiFrame>
       </section>
 
-      <section aria-label="Works">
+      <section id="works" aria-label="Works" className="scroll-mt-8">
         <AsciiFrame label="WORKS">
           <ul className="flex flex-col divide-y divide-line">
             {worksConfig.items.map((item, index) => {
@@ -50,7 +69,7 @@ export default function FallbackView() {
                   key={item.id}
                   className="flex flex-col gap-3 py-4 first:pt-0 last:pb-0"
                 >
-                  <div className="flex flex-wrap items-baseline justify-between gap-3 font-mono text-xs tracking-[0.18em] uppercase">
+                  <div className="flex flex-wrap items-baseline justify-between gap-3 font-mono text-[13px] tracking-[0.16em] uppercase">
                     <div className="flex items-baseline gap-3">
                       <span className="text-muted">{numLabel}</span>
                       <span className="font-bold text-ink">{item.title}</span>
@@ -103,7 +122,11 @@ export default function FallbackView() {
         </AsciiFrame>
       </section>
 
-      <section aria-label={contactConfig.label}>
+      <section
+        id="contact"
+        aria-label={contactConfig.label}
+        className="scroll-mt-8"
+      >
         <AsciiFrame label={contactConfig.label}>
           <ul className="flex flex-col divide-y divide-line">
             {contactConfig.items.map((item) => (

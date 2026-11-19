@@ -59,7 +59,7 @@ The site is a static-capable Next.js App Router portfolio with zero required run
 
 ## Intro & Adaptive Quality Settings
 
-- **Intro tuning:** edit `src/config/intro.ts` (`revealDurationMs`, `revealHaloRadiusCells`, `startSpeckleDensity`, `maxSpeckleDensity`, `dissolveDurationMs`).
+- **Intro inputs & tuning:** once the 4-second Bayer reveal completes, any of the following enters the 3D scene: mouse wheel or small trackpad scroll deltas (in either direction), touch swipe or tap, clicking or tapping anywhere on the intro dialog, or pressing `Enter`, `Space`, `ArrowDown`, or `PageDown` (with `prefers-reduced-motion`, click/activate the static `ENTER` button). Tune timing and thresholds in `src/config/intro.ts` (`revealDurationMs`, `revealHaloRadiusCells`, `startSpeckleDensity`, `maxSpeckleDensity`, `dissolveDurationMs`, `wheelThresholdPx`, `readyFailsafeMs`).
 - **Quality tiers:** edit `src/config/quality.ts` (`tiers` for DPR cap and shadow map size/toggle, plus `warmupMs`, `sampleWindowMs`, `fpsThreshold`, `consecutiveLowSamplesRequired`, and `cooldownMs`). The chosen tier persists per browser session in `sessionStorage`.
 
 ## Adding a Journey Zone
@@ -71,12 +71,13 @@ All scroll zones, lengths, and camera waypoints live in `src/config/journey.ts`.
 
 ## Navigation & Icons
 
-- **Floating PillNav (`src/config/nav.ts`, `src/components/ui/SiteNavbar.tsx`):**
+- **Floating PillNav & Deep Links (`src/config/nav.ts`, `src/components/ui/SiteNavbar.tsx`):**
   - `navConfig.items` (`HOME`, `WORKS`, `ABOUT`, `CONTACT`) computes each item's `targetProgress` directly from `getZoneProgressRange()` (`src/config/journey.ts`), `worksConfig.items.length`, and `voidConfig.panels`.
-  - `getActiveNavHref(progress)` highlights the matching item as the user scrolls; clicking any item or the logo calls `scrollToProgress()` / `scrollToTop()` (`src/lib/scrollProgress.ts`) without mutating the URL hash.
-  - `SiteNavbar` switches cleanly between `sm` (`< 768px`, sized to fit narrow viewports down to `320px`) and `md` (`>= 768px`) without collapsing to a menu button (`collapse="never"`).
+  - `getActiveNavHref(progress)` highlights the matching item as the user scrolls; clicking any item or the logo calls `scrollToProgress()` / `scrollToTop()` (`src/lib/scrollProgress.ts`) and updates the URL hash via `history.replaceState` without adding browser history entries.
+  - Opening the site with `#home`, `#works`, `#about`, or `#contact` skips the intro once the 3D scene is ready and jumps directly to the matching section (reusing `getNavTargetProgressForHash()`). Unknown hashes fall back to the normal intro; combining `?intro=1` with a valid hash plays the intro first before jumping to that hash target. Matching section IDs (`#home`, `#about`, `#works`, `#contact`) are also wired on `FallbackView`.
+  - `SiteNavbar` switches cleanly between `sm` (`< 768px`, sized to fit narrow viewports down to `360px` with `13px` labels) and `md` (`>= 768px`) without collapsing to a menu button (`collapse="never"`).
 - **Phosphor Icons (`@phosphor-icons/react`):**
-  - `MouseScrollIcon` (`@phosphor-icons/react/dist/ssr/MouseScroll`, `light` weight, `22px`) — animated with `scroll-bob` (`src/app/globals.css`, static under `prefers-reduced-motion`) in `IntroOverlay` and `Hero`.
+  - `MouseScrollIcon` (`@phosphor-icons/react/dist/ssr/MouseScroll`, `light` weight, `20px` in `IntroOverlay` button / `22px` in `Hero`) — animated with `scroll-bob` (`src/app/globals.css`, static under `prefers-reduced-motion`).
   - `ArrowUpRightIcon` (`@phosphor-icons/react/dist/ssr/ArrowUpRight`, `regular` weight, `14px`) — external link indicator on Contact rows (`VoidPanels`, `FallbackView`) and `"VIEW PROJECT"` buttons (`ProjectCard`, `FallbackView`).
 
 ## Adding a Project
@@ -98,6 +99,12 @@ All closing Void zone text, links, particle counts, and panel fade timings live 
 - **About copy:** edit `aboutConfig` in `src/config/about.ts`.
 - **Contact links & button text:** edit `contactConfig.items` (`label`, `text`, `href`, `external`) and `backToStartLabel` in `src/config/contact.ts`. External links automatically open in a new tab with `rel="noopener noreferrer"`.
 - **Void density & timing:** edit `voidConfig` in `src/config/void.ts` (`scrollVh`, desktop/mobile dot and dotted-line counts, drift speed, and scroll-progress fade windows for About, Contact, and `"BACK TO START"`).
+
+## Metadata, Preview Image & Theme Tokens
+
+- **Site Title, Description & URL (`src/config/site.ts`, `src/app/layout.tsx`):** update `siteConfig.title`, `siteConfig.description`, `siteConfig.url` (used as `metadataBase` and Open Graph canonical URL), and `siteConfig.ogImage`.
+- **Social Preview Image (`public/og.png`):** replace `public/og.png` (`1200×630` PNG) to update Open Graph and `summary_large_image` Twitter link previews.
+- **Border Tokens (`src/app/globals.css`):** `--color-line-strong` (`#4A4A4A`, `border-line-strong`) styles outer component boundaries (buttons, cards, `AsciiFrame`, `PillNav` borders), while `--color-line` (`#2A2A2A`, `border-line`) is reserved for decorative dividers and inner rules.
 
 ## Credits
 

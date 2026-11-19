@@ -43,6 +43,17 @@ export default function SiteNavbar() {
     return subscribeScrollProgress(syncActive);
   }, []);
 
+  const updateUrlHash = (hash: string) => {
+    if (typeof window === "undefined") return;
+    if (window.location.hash !== hash) {
+      window.history.replaceState(
+        null,
+        "",
+        `${window.location.pathname}${window.location.search}${hash}`,
+      );
+    }
+  };
+
   const handleItemClick = (
     item: PillNavItem,
     index: number,
@@ -51,11 +62,13 @@ export default function SiteNavbar() {
     event.preventDefault();
     const entry = navConfig.items[index] ?? navConfig.items.find((n) => n.href === item.href);
     if (!entry) return;
+    updateUrlHash(entry.href);
     scrollToProgress(entry.targetProgress);
   };
 
   const handleLogoClick = (event: MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault();
+    updateUrlHash(navConfig.logoHref);
     scrollToTop();
   };
 

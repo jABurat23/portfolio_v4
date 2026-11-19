@@ -77,7 +77,7 @@
 
 .pill-nav__logo-link:focus-visible,
 .pill-nav__toggle:focus-visible {
-  outline: 1px solid var(--pn-ring);
+  outline: 2px solid var(--pn-ring);
   outline-offset: 2px;
 }
 
@@ -175,8 +175,8 @@
 
 .pill-nav__item:focus-visible,
 .pill-nav__row:focus-visible {
-  outline: 1px solid var(--pn-ring);
-  outline-offset: -2px;
+  outline: 2px solid var(--pn-ring);
+  outline-offset: 2px;
 }
 
 .pill-nav__face {
@@ -258,7 +258,7 @@
 }
 
 .pill-nav[data-focus] .pill-nav__glide {
-  outline: 1px solid var(--pn-ring);
+  outline: 2px solid var(--pn-ring);
   outline-offset: 2px;
 }
 

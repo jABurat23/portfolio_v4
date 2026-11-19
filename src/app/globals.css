@@ -5,6 +5,7 @@
   --color-ink: #F2F2F2;
   --color-muted: #7A7A7A;
   --color-line: #2A2A2A;
+  --color-line-strong: #4A4A4A;
 
   --radius-none: 0px;
   --radius-xs: 0px;
@@ -35,20 +36,11 @@
     background-color: var(--color-background);
     color: var(--color-ink);
   }
-}
 
-@keyframes gentle-pulse {
-  0%,
-  100% {
-    opacity: 0.35;
+  :focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 2px;
   }
-  50% {
-    opacity: 1;
-  }
-}
-
-.animate-gentle-pulse {
-  animation: gentle-pulse 2.8s ease-in-out infinite;
 }
 
 @keyframes scroll-bob {

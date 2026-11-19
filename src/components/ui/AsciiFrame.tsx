@@ -9,7 +9,7 @@ export interface AsciiFrameProps {
 
 export function AsciiFrame({ label, children, className }: AsciiFrameProps) {
   return (
-    <div className={cn("border border-line bg-background p-4", className)}>
+    <div className={cn("border border-line-strong bg-background p-4", className)}>
       <div className="mb-3 flex items-center justify-between border-b border-line pb-2 font-mono text-xs tracking-wider text-muted uppercase">
         <span>+--- [ {label} ]</span>
         <span aria-hidden="true">---+</span>

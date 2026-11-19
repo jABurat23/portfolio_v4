@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { CatmullRomCurve3, MathUtils, Vector3 } from "three";
 import { journeyConfig, mapProgressToCurveT } from "@/config/journey";
 import { landscapeConfig } from "@/config/landscape";
-import { getScrollProgress } from "@/lib/scrollProgress";
+import { getScrollProgress, getScrollSnapVersion } from "@/lib/scrollProgress";
 import { hasTerrainAt, sampleTerrainHeight } from "./landscape/terrainMath";
 
 const _curvePos = new Vector3();
@@ -17,6 +17,7 @@ export default function CameraRig() {
   const pointerTargetRef = useRef({ x: 0, y: 0 });
   const pointerSmoothedRef = useRef({ x: 0, y: 0 });
   const smoothedProgressRef = useRef(getScrollProgress());
+  const snapVersionRef = useRef(getScrollSnapVersion());
   const driftTimeRef = useRef(0);
 
   const { positionCurve, targetCurve } = useMemo(() => {
@@ -109,12 +110,18 @@ export default function CameraRig() {
       return;
     }
 
-    smoothedProgressRef.current = MathUtils.damp(
-      smoothedProgressRef.current,
-      rawProgress,
-      journeyConfig.scrollDamping,
-      delta,
-    );
+    const latestSnap = getScrollSnapVersion();
+    if (latestSnap !== snapVersionRef.current) {
+      snapVersionRef.current = latestSnap;
+      smoothedProgressRef.current = rawProgress;
+    } else {
+      smoothedProgressRef.current = MathUtils.damp(
+        smoothedProgressRef.current,
+        rawProgress,
+        journeyConfig.scrollDamping,
+        delta,
+      );
+    }
     const curveT = mapProgressToCurveT(smoothedProgressRef.current, true);
 
     positionCurve.getPoint(curveT, _curvePos);

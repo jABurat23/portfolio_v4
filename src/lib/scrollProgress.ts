@@ -1,7 +1,12 @@
 export type ScrollProgressListener = (progress: number) => void;
 
 let currentProgress = 0;
+let snapVersion = 0;
 const listeners = new Set<ScrollProgressListener>();
+
+export interface SetScrollProgressOptions {
+  snap?: boolean;
+}
 
 function clamp01(value: number): number {
   if (!Number.isFinite(value)) return 0;
@@ -12,9 +17,20 @@ export function getScrollProgress(): number {
   return currentProgress;
 }
 
-export function setScrollProgress(value: number): void {
+export function getScrollSnapVersion(): number {
+  return snapVersion;
+}
+
+export function setScrollProgress(
+  value: number,
+  options?: SetScrollProgressOptions,
+): void {
   const next = clamp01(value);
-  if (Math.abs(next - currentProgress) < 1e-6) return;
+  const changed = Math.abs(next - currentProgress) >= 1e-6;
+  if (options?.snap) {
+    snapVersion += 1;
+  }
+  if (!changed && !options?.snap) return;
   currentProgress = next;
   listeners.forEach((listener) => listener(currentProgress));
 }

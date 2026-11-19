@@ -90,7 +90,7 @@ const THEMES: Record<PillNavTheme, CssVarMap> = {
   dark: {
     "--pn-surface": "#0A0A0A",
     "--pn-solid": "#0A0A0A",
-    "--pn-edge": "#2A2A2A",
+    "--pn-edge": "#4A4A4A",
     "--pn-text": "#7A7A7A",
     "--pn-strong": "#F2F2F2",
     "--pn-pill": "#F2F2F2",
@@ -103,7 +103,7 @@ const THEMES: Record<PillNavTheme, CssVarMap> = {
   light: {
     "--pn-surface": "#F2F2F2",
     "--pn-solid": "#F2F2F2",
-    "--pn-edge": "#2A2A2A",
+    "--pn-edge": "#4A4A4A",
     "--pn-text": "#7A7A7A",
     "--pn-strong": "#0A0A0A",
     "--pn-pill": "#0A0A0A",
@@ -117,14 +117,14 @@ const THEMES: Record<PillNavTheme, CssVarMap> = {
 
 const SIZES: Record<PillNavSize, CssVarMap> = {
   sm: {
-    "--pn-h": "36px",
+    "--pn-h": "40px",
     "--pn-pad": "3px",
-    "--pn-inner": "30px",
-    "--pn-x": "9px",
-    "--pn-font": "11px",
-    "--pn-gap": "4px",
-    "--pn-mark": "17px",
-    "--pn-tracking": "0.08em",
+    "--pn-inner": "34px",
+    "--pn-x": "8px",
+    "--pn-font": "13px",
+    "--pn-gap": "5px",
+    "--pn-mark": "18px",
+    "--pn-tracking": "0.06em",
   },
   md: {
     "--pn-h": "44px",

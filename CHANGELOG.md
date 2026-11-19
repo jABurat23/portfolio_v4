@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-11-19
+
+### Added
+
+- Page description (`"Portfolio of Agustin, an IT student at Cebu Technological University who likes building things."`) and canonical `siteConfig.url` (`"https://agustinportfolio.vercel.app"`) in `src/config/site.ts`.
+- Root Next.js `metadataBase`, Open Graph tags (`website`, `1200×630` image), Twitter `summary_large_image` card (`src/app/layout.tsx`), and a `1200×630` two-tone dithered landscape preview image at `public/og.png`, plus `"Agustin"`-branded page titles on fallback, `404`, and error pages.
+- Deep-link hash routing (`#home`, `#works`, `#about`, `#contact`) via `getNavTargetProgressForHash` (`src/config/nav.ts`), instant scene/Lenis/camera snapping (`IntroOverlay`, `ScrollManager`, `InteractiveWorld`, `CameraRig`, `scrollProgress.ts`), `history.replaceState` hash synchronization on navbar/logo clicks (`SiteNavbar`), `?intro=1#...` sequencing, and matching section IDs on `FallbackView`.
+- `--color-line-strong` (`#4A4A4A`) Tailwind theme token (`src/app/globals.css`) for outer component boundaries.
+
+### Changed
+
+- Updated page `<title>` to `"Agustin | IT student and builder"` (`src/config/site.ts`, `src/app/layout.tsx`).
+- Converted the intro `"SCROLL TO ENTER"` entry trigger (`src/components/ui/IntroOverlay.tsx`) into a bordered `>= 44px` `OutlinedButton` containing the animated Phosphor `MouseScrollIcon` while preserving wheel, trackpad, touch, full-dialog click, keyboard, and reduced-motion `ENTER` inputs.
+- Brightened outer component borders (`OutlinedButton`, `ProjectCard`, `AsciiFrame`, `PillNav` bar/logo rim, and `global-error.tsx`) to `#4A4A4A` (`line-strong`) while reserving `#2A2A2A` (`line`) for decorative dividers and inner rules, and removed unused `gentle-pulse` CSS keyframes.
+- Raised all readable UI text across buttons, Contact rows, `ProjectCard` titles/captions/placeholders/descriptions, `FallbackView`, `global-error.tsx`, and `PillNav` `sm` nav labels to at least `13px`.
+
+## [0.11.1] - 2026-11-19
+
+### Fixed
+
+- **Intro wheel, trackpad, touch, click, and keyboard entry (`src/components/ui/IntroOverlay.tsx`, `src/config/intro.ts`):** Added window-level capture `wheel` handling that normalizes `deltaMode` and accumulates small trackpad deltas (`>= 16px`, either direction) once the reveal completes, added touch tap/swipe handling (`touchend`/`touchmove`) without synthetic double-clicks, enabled full-dialog click/tap entry, handled `Enter`/`Space`/`ArrowDown`/`PageDown` with `preventDefault()`, added a single-fire entry guard, and added a `readyFailsafeMs` (`2000ms`) timer so stalled scene or font readiness never blocks entry indefinitely.
+- **Single assistive-tech content exposure (`src/components/ui/InteractiveWorld.tsx`, `src/components/ui/ProjectCard.tsx`, `src/components/ui/VoidPanels.tsx`):** Removed `aria-hidden="true"` from focusable panel/card containers, gated inactive overlays with `inert` and `visibility: hidden`, omitted `sr-only` summaries during the intro, and omitted active Corridor works, About, or Contact summaries from the `sr-only` backup regions while visible overlays are active so every item appears once in the accessibility tree and Contact links remain keyboard- and screen-reader-accessible.
+- **Duplicate `"COMING SOON"` in placeholder cards (`src/components/ui/ProjectCard.tsx`):** Suppressed the redundant caption line when a card has no image or description and its caption is `"COMING SOON"`, keeping the framed placeholder box as the single `"COMING SOON"` indicator without changing cards with real images or descriptions.
+- **Corridor and Void overlay fade timing (`src/config/works.ts`, `src/config/void.ts`):** Tightened fade windows (`focusHalfWindowSegments: 0.48`, `plateauRatio: 0.75`, and `aboutFadeInStart: 0.06` .. `backButtonFadeInEnd: 0.7`) so `ProjectCard`, About, Contact, and `"BACK TO START"` reach `1.0` opacity quickly, hold across clean plateaus, fade cleanly within `< 150px` of scroll, and never overlap between About and Contact.
+- **Keyboard focus indicators (`src/app/globals.css`, `src/lib/interactive.ts`, `src/components/ui/PillNav/PillNav.css`):** Upgraded `:focus-visible` outlines across buttons, links, Contact rows, the intro prompt button, and `PillNav` items/toggles/logo to `2px` `#F2F2F2` with `2px` offset and zero overflow clipping.
+
 ## [0.11.0] - 2026-11-19
 
 ### Added

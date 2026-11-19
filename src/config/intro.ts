@@ -10,6 +10,8 @@ export interface IntroConfig {
   startSpeckleDensity: number;
   maxSpeckleDensity: number;
   dissolveDurationMs: number;
+  wheelThresholdPx: number;
+  readyFailsafeMs: number;
 }
 
 export const introConfig: IntroConfig = {
@@ -24,4 +26,6 @@ export const introConfig: IntroConfig = {
   startSpeckleDensity: 0.03,
   maxSpeckleDensity: 0.42,
   dissolveDurationMs: 1500,
+  wheelThresholdPx: 16,
+  readyFailsafeMs: 2000,
 };
