@@ -1,0 +1,148 @@
+"use client";
+
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Lenis from "lenis";
+import { type RefObject, useEffect, useRef, useState } from "react";
+import { journeyConfig } from "@/config/journey";
+import { registerScrollToTop, setScrollProgress } from "@/lib/scrollProgress";
+
+export interface ScrollManagerProps {
+  spacerRef: RefObject<HTMLDivElement | null>;
+  introDone: boolean;
+  introDidPlay: boolean;
+}
+
+function readWindowScrollProgress(spacer: HTMLElement): number {
+  const maxScroll = Math.max(1, spacer.offsetHeight - window.innerHeight);
+  return Math.max(0, Math.min(1, window.scrollY / maxScroll));
+}
+
+export default function ScrollManager({
+  spacerRef,
+  introDone,
+  introDidPlay,
+}: ScrollManagerProps) {
+  const lenisRef = useRef<Lenis | null>(null);
+  const triggerRef = useRef<ScrollTrigger | null>(null);
+  const introDoneRef = useRef(introDone);
+  const [reducedMotion, setReducedMotion] = useState(false);
+
+  useEffect(() => {
+    introDoneRef.current = introDone;
+  }, [introDone]);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const syncReducedMotion = () => setReducedMotion(mediaQuery.matches);
+    const rafId = requestAnimationFrame(syncReducedMotion);
+
+    mediaQuery.addEventListener("change", syncReducedMotion);
+    return () => {
+      cancelAnimationFrame(rafId);
+      mediaQuery.removeEventListener("change", syncReducedMotion);
+    };
+  }, []);
+
+  useEffect(() => {
+    const spacer = spacerRef.current;
+    if (!spacer) return;
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    let lenis: Lenis | null = null;
+    let tickerCallback: ((time: number) => void) | null = null;
+
+    if (!reducedMotion) {
+      const { lerp, wheelMultiplier, syncTouch } = journeyConfig.smoothScroll;
+      lenis = new Lenis({
+        smoothWheel: true,
+        syncTouch,
+        lerp,
+        wheelMultiplier,
+      });
+      lenisRef.current = lenis;
+
+      if (!introDoneRef.current) {
+        lenis.stop();
+      }
+
+      lenis.on("scroll", ScrollTrigger.update);
+
+      tickerCallback = (time: number) => {
+        lenis?.raf(time * 1000);
+      };
+      gsap.ticker.add(tickerCallback);
+      gsap.ticker.lagSmoothing(0);
+    }
+
+    const ctx = gsap.context(() => {
+      triggerRef.current = ScrollTrigger.create({
+        trigger: spacer,
+        start: "top top",
+        end: "bottom bottom",
+        invalidateOnRefresh: true,
+        onUpdate: (self) => {
+          setScrollProgress(self.progress);
+        },
+      });
+    }, spacerRef);
+
+    ScrollTrigger.refresh();
+    const initial = triggerRef.current
+      ? triggerRef.current.progress
+      : readWindowScrollProgress(spacer);
+    setScrollProgress(initial);
+
+    const unregisterScrollToTop = registerScrollToTop(() => {
+      if (lenis && !reducedMotion) {
+        lenis.scrollTo(0);
+      } else {
+        window.scrollTo({ top: 0, behavior: "auto" });
+      }
+    });
+
+    return () => {
+      unregisterScrollToTop();
+      ctx.revert();
+      triggerRef.current = null;
+      if (tickerCallback) {
+        gsap.ticker.remove(tickerCallback);
+      }
+      if (lenis) {
+        lenis.destroy();
+        if (lenisRef.current === lenis) {
+          lenisRef.current = null;
+        }
+      }
+    };
+  }, [spacerRef, reducedMotion]);
+
+  useEffect(() => {
+    const lenis = lenisRef.current;
+    const spacer = spacerRef.current;
+
+    if (!introDone) {
+      lenis?.stop();
+      return;
+    }
+
+    if (introDidPlay) {
+      window.scrollTo(0, 0);
+      lenis?.scrollTo(0, { immediate: true, force: true });
+      setScrollProgress(0);
+    }
+
+    ScrollTrigger.refresh();
+    if (!introDidPlay && spacer) {
+      const synced = triggerRef.current
+        ? triggerRef.current.progress
+        : readWindowScrollProgress(spacer);
+      setScrollProgress(synced);
+    }
+
+    lenis?.start();
+  }, [introDone, introDidPlay, spacerRef, reducedMotion]);
+
+  return null;
+}

@@ -1,0 +1,6 @@
+{
+  "name": "Next.js + R3F Compatibility Test",
+  "description": "Minimal Next.js App Router and React Three Fiber compatibility test.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

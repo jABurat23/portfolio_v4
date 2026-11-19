@@ -1,0 +1,17 @@
+node_modules/
+.next/
+out/
+build/
+dist/
+coverage/
+.vercel
+.turbo/
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.log
+*.tsbuildinfo
+.env*
+!.env.example
+.aistudio/
+.playwright-cli/
