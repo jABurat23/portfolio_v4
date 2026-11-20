@@ -38,7 +38,7 @@ export interface ActiveZoneInfo {
   endProgress: number;
 }
 
-export interface CorridorFrameFocus {
+export interface CorridorStopFocus {
   index: number;
   item: WorkItem;
   side: "left" | "right";
@@ -50,7 +50,7 @@ function buildCorridorWaypoints(): JourneyWaypoint[] {
   const {
     entryZ,
     startZ,
-    frameSpacingZ,
+    stopSpacingZ,
     cameraApproachZ,
     cameraHeight,
   } = worksConfig.corridor;
@@ -65,10 +65,10 @@ function buildCorridorWaypoints(): JourneyWaypoint[] {
 
   for (let i = 0; i < items.length; i += 1) {
     const side = i % 2 === 0 ? -1 : 1;
-    const frameZ = startZ - i * frameSpacingZ;
+    const stopZ = startZ - i * stopSpacingZ;
     waypoints.push({
-      position: [-side * 0.14, cameraHeight, frameZ + cameraApproachZ],
-      target: [side * 0.78, cameraHeight - 0.15, frameZ - 1.5],
+      position: [-side * 0.14, cameraHeight, stopZ + cameraApproachZ],
+      target: [side * 0.78, cameraHeight - 0.15, stopZ - 1.5],
     });
   }
 
@@ -125,7 +125,7 @@ export const journeyConfig: JourneyConfig = {
     },
     {
       id: "corridor",
-      scrollVh: Math.max(1, worksConfig.items.length) * worksConfig.corridor.vhPerFrame,
+      scrollVh: Math.max(1, worksConfig.items.length) * worksConfig.corridor.vhPerStop,
       waypoints: corridorWaypoints,
     },
     {
@@ -206,14 +206,14 @@ export function getZoneAtProgress(progress: number): ActiveZoneInfo {
 
 /**
  * Remaps corridor local progress (0..1) so the camera glides smoothly across the
- * gaps and gently dwells as it passes each work frame waypoint.
+ * gaps and gently dwells as it passes each work stop waypoint.
  */
 export function remapCorridorProgress(localProgress: number): number {
   const u = Math.max(0, Math.min(1, localProgress));
   const count = worksConfig.items.length;
   if (count === 0) return u;
 
-  // Corridor waypoints include entry (1) + frames (count) + exit (1), plus seam from landscape = count + 2 segments.
+  // Corridor waypoints include entry (1) + stops (count) + exit (1), plus seam from landscape = count + 2 segments.
   const segments = count + 2;
   const halfWidth = 0.48 / segments;
   const strength = worksConfig.corridor.dwellStrength;
@@ -261,9 +261,9 @@ export function mapProgressToCurveT(
   return Math.max(0, Math.min(1, segPos / totalSegments));
 }
 
-export function getCorridorFrameFocus(
+export function getCorridorStopFocus(
   progress: number,
-): CorridorFrameFocus | null {
+): CorridorStopFocus | null {
   const info = getZoneAtProgress(progress);
   if (info.zone.id !== "corridor") return null;
 

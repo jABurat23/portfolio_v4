@@ -71,18 +71,18 @@ All scroll zones, lengths, and camera waypoints live in `src/config/journey.ts`.
 
 ## Navigation & Icons
 
-- **Floating PillNav & Deep Links (`src/config/nav.ts`, `src/components/ui/SiteNavbar.tsx`):**
+- **Floating Navbar & Deep Links (`src/config/nav.ts`, `src/components/ui/SiteNavbar.tsx`):**
   - `navConfig.items` (`HOME`, `WORKS`, `ABOUT`, `CONTACT`) computes each item's `targetProgress` directly from `getZoneProgressRange()` (`src/config/journey.ts`), `worksConfig.items.length`, and `voidConfig.panels`.
-  - `getActiveNavHref(progress)` highlights the matching item as the user scrolls; clicking any item or the logo calls `scrollToProgress()` / `scrollToTop()` (`src/lib/scrollProgress.ts`) and updates the URL hash via `history.replaceState` without adding browser history entries.
+  - `getActiveNavHref(progress)` highlights the matching item with a `4px` square dot as the user scrolls; clicking any item calls `scrollToProgress()` (`src/lib/scrollProgress.ts`) and updates the URL hash via `history.replaceState` without adding browser history entries.
   - Opening the site with `#home`, `#works`, `#about`, or `#contact` skips the intro once the 3D scene is ready and jumps directly to the matching section (reusing `getNavTargetProgressForHash()`). Unknown hashes fall back to the normal intro; combining `?intro=1` with a valid hash plays the intro first before jumping to that hash target. Matching section IDs (`#home`, `#about`, `#works`, `#contact`) are also wired on `FallbackView`.
-  - `SiteNavbar` switches cleanly between `sm` (`< 768px`, sized to fit narrow viewports down to `360px` with `13px` labels) and `md` (`>= 768px`) without collapsing to a menu button (`collapse="never"`).
+  - `SiteNavbar` renders a sharp (`border-radius: 0`), logo-free bar that switches cleanly between `sm` (`< 768px`, sized to fit narrow viewports down to `320px` with `13px` labels) and `md` (`>= 768px`) without collapsing to a menu button (`collapse="never"`).
 - **Phosphor Icons (`@phosphor-icons/react`):**
-  - `MouseScrollIcon` (`@phosphor-icons/react/dist/ssr/MouseScroll`, `light` weight, `20px` in `IntroOverlay` button / `22px` in `Hero`) — animated with `scroll-bob` (`src/app/globals.css`, static under `prefers-reduced-motion`).
+  - `TriangleIcon` (`@phosphor-icons/react/dist/ssr/Triangle`, `fill` weight, rotated `180deg`, `12px` in `IntroOverlay` entry button subtitle and `Hero` backing plate) — animated with `triangle-blink` (`src/app/globals.css`, static at full opacity under `prefers-reduced-motion`).
   - `ArrowUpRightIcon` (`@phosphor-icons/react/dist/ssr/ArrowUpRight`, `regular` weight, `14px`) — external link indicator on Contact rows (`VoidPanels`, `FallbackView`) and `"VIEW PROJECT"` buttons (`ProjectCard`, `FallbackView`).
 
 ## Adding a Project
 
-All Corridor project entries, card focus timing, and frame layout parameters live in `src/config/works.ts`. To add or edit a project:
+All Corridor project entries, card focus timing, and stop layout parameters live in `src/config/works.ts`. To add or edit a project:
 
 1. Append or update an object in `worksConfig.items` with:
    - `id` (unique string) and `title` (required)
@@ -90,7 +90,7 @@ All Corridor project entries, card focus timing, and frame layout parameters liv
    - `description` (optional body copy shown in the HTML card and fallback view)
    - `image` (optional local path under `/public/works/`, written as `"/works/filename.png"`; external image URLs are ignored)
    - `url` (optional external link rendering the `"VIEW PROJECT"` outlined button)
-2. Corridor frame placements (`CorridorScene`), alternating left/right camera waypoints (`buildCorridorWaypoints()`), Corridor scroll length (`items.length * vhPerFrame`), terrain length (`DuneTerrain`), crisp HTML cards (`ProjectCard`), static fallback works list (`FallbackView`), and the screen-reader works list update automatically from config.
+2. Alternating left/right camera waypoints (`buildCorridorWaypoints()`), Corridor scroll length (`items.length * vhPerStop`), flattened causeway terrain (`DuneTerrain`), crisp HTML cards (`ProjectCard`), static fallback works list (`FallbackView`), and the screen-reader works list update automatically from config.
 
 ## Editing About and Contact
 

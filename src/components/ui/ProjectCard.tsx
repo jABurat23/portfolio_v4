@@ -3,7 +3,7 @@
 import { ArrowUpRightIcon } from "@phosphor-icons/react/dist/ssr/ArrowUpRight";
 import Image from "next/image";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { getCorridorFrameFocus } from "@/config/journey";
+import { getCorridorStopFocus } from "@/config/journey";
 import { worksConfig } from "@/config/works";
 import { OUTLINED_BUTTON_CLASS } from "@/lib/interactive";
 import { getScrollProgress, subscribeScrollProgress } from "@/lib/scrollProgress";
@@ -61,7 +61,7 @@ export default function ProjectCard({
         return;
       }
 
-      const focus = getCorridorFrameFocus(progress);
+      const focus = getCorridorStopFocus(progress);
       if (!focus) {
         applyCardState(cardWrapRef.current, 0, false);
         emitExposedIndex(null);
@@ -96,8 +96,8 @@ export default function ProjectCard({
 
   const displayIndex = activeIndex >= 0 ? activeIndex : 0;
   const numLabel = `[ ${String(displayIndex + 1).padStart(2, "0")} ]`;
-  const frameOnLeft = displayIndex % 2 === 0;
-  const desktopSideClass = frameOnLeft
+  const stopOnLeft = displayIndex % 2 === 0;
+  const desktopSideClass = stopOnLeft
     ? "md:right-10 md:left-auto"
     : "md:left-10 md:right-auto";
 

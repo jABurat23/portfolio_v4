@@ -6,7 +6,6 @@ import { PCFShadowMap } from "three";
 import { landscapeConfig } from "@/config/landscape";
 import { getQualityTierSpec, resolveInitialQuality } from "@/lib/quality";
 import CameraRig from "./CameraRig";
-import CorridorScene from "./corridor/CorridorScene";
 import DitherPass from "./DitherPass";
 import LandscapeScene from "./landscape/LandscapeScene";
 import QualityController from "./QualityController";
@@ -92,7 +91,6 @@ export default function SceneCanvas({
         initialShadowsEnabled={initialTierSpec.shadowsEnabled}
         initialShadowMapSize={initialTierSpec.shadowMapSize}
       />
-      <CorridorScene />
       <VoidScene />
       <QualityController
         initialTier={initialQuality.tier}

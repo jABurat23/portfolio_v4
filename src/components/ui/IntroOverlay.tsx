@@ -1,6 +1,6 @@
 "use client";
 
-import { MouseScrollIcon } from "@phosphor-icons/react/dist/ssr/MouseScroll";
+import { TriangleIcon } from "@phosphor-icons/react/dist/ssr/Triangle";
 import {
   type MouseEvent,
   type RefObject,
@@ -371,19 +371,20 @@ export default function IntroOverlay({
           />
 
           {isReady && (
-            <div className="pointer-events-none fixed inset-x-0 bottom-12 z-10 flex justify-center px-6">
-              <OutlinedButton
+            <div className="pointer-events-none fixed inset-x-0 bottom-10 z-10 flex justify-center px-6">
+              <button
+                type="button"
                 onClick={handlePointerEnter}
-                className="pointer-events-auto gap-2.5 tracking-[0.2em]"
+                className="pointer-events-auto inline-flex min-h-11 cursor-pointer flex-col items-center justify-center gap-2 px-4 py-2 font-mono text-[13px] tracking-[0.2em] text-muted uppercase transition-colors duration-150 hover:text-ink focus-visible:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink motion-reduce:transition-none"
               >
-                <MouseScrollIcon
-                  size={20}
-                  weight="light"
-                  aria-hidden="true"
-                  className="shrink-0 motion-safe:animate-scroll-bob"
-                />
                 <span>{introConfig.promptText}</span>
-              </OutlinedButton>
+                <TriangleIcon
+                  size={12}
+                  weight="fill"
+                  aria-hidden="true"
+                  className="shrink-0 rotate-180 motion-safe:animate-triangle-blink"
+                />
+              </button>
             </div>
           )}
 

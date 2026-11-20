@@ -5,7 +5,6 @@ import { getActiveNavHref, navConfig } from "@/config/nav";
 import {
   getScrollProgress,
   scrollToProgress,
-  scrollToTop,
   subscribeScrollProgress,
 } from "@/lib/scrollProgress";
 import PillNav, { type PillNavItem, type PillNavSize } from "./PillNav/PillNav";
@@ -66,12 +65,6 @@ export default function SiteNavbar() {
     scrollToProgress(entry.targetProgress);
   };
 
-  const handleLogoClick = (event: MouseEvent<HTMLAnchorElement>) => {
-    event.preventDefault();
-    updateUrlHash(navConfig.logoHref);
-    scrollToTop();
-  };
-
   return (
     <div
       className="pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center px-2"
@@ -81,10 +74,6 @@ export default function SiteNavbar() {
     >
       <div className="pointer-events-auto max-w-full">
         <PillNav
-          logo={navConfig.logoSrc}
-          logoAlt={navConfig.logoAlt}
-          logoHref={navConfig.logoHref}
-          onLogoClick={handleLogoClick}
           items={navConfig.items}
           activeHref={activeHref}
           onItemClick={handleItemClick}

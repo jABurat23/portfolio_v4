@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.13.0] - 2026-11-19
+
+### Changed
+
+- Removed the border from the intro `"SCROLL TO ENTER"` entry control (`src/components/ui/IntroOverlay.tsx`), keeping a `44px` minimum touch target, hover full-ink state, `2px` keyboard focus ring, and a centered blinking downward `TriangleIcon` (`weight="fill"`, rotated `180deg`) driven by `triangle-blink` (`src/app/globals.css`, static at full opacity under `prefers-reduced-motion`).
+- Replaced the Hero scroll indicator (`src/components/ui/Hero.tsx`) with a borderless solid `#0A0A0A` backing plate containing the same blinking downward `TriangleIcon`.
+- Flattened `PillNav` (`src/components/ui/PillNav/PillNav.tsx`, `PillNav.css`, `src/components/ui/SiteNavbar.tsx`, `src/config/nav.ts`) to sharp `0px` corners across the bar, items, hover fills, clip-paths, and `4px` square active dot (`nav` without logo bubble), centered cleanly down to `320px` wide.
+- Renamed remaining Corridor frame layout configuration and focus helper terminology to `"stop"` (`stopSpacingZ`, `vhPerStop`, `CorridorStopFocus`, `getCorridorStopFocus`) in `src/config/works.ts`, `src/config/journey.ts`, `src/config/nav.ts`, and `src/components/ui/ProjectCard.tsx`.
+- Recaptured `public/og.png` (`1200×630` PNG) showing `"AGUSTIN"` over the dithered landscape with no navbar or scroll indicator.
+- Updated `AGENTS.md` and `README.md` for sharp corners with no exceptions, logo-free navigation, `TriangleIcon` scroll indicators, and `"stop"` corridor terminology.
+
+### Removed
+
+- Corridor 3D frame scenery (`src/components/scene/corridor/CorridorScene.tsx`, `CorridorFrame.tsx`, `placeholderTexture.ts`), its mount in `SceneCanvas.tsx`, and frame-only layout fields (`frameOffsetX`, `frameWidth`, `frameHeight`, `beamThickness`, `frameDepth`, `frameYaw`) in `src/config/works.ts`.
+- Navigation logo slot, props, `next/image` rendering, spin/pop logic, and CSS rules from `SiteNavbar.tsx`, `PillNav.tsx`, `PillNav.css`, and `src/config/nav.ts`.
+- `MouseScrollIcon` imports from `IntroOverlay.tsx` and `Hero.tsx` and unused `scroll-bob` animation from `src/app/globals.css`.
+
 ## [0.12.0] - 2026-11-19
 
 ### Added

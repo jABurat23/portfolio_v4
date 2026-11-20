@@ -2,7 +2,6 @@
 
 // Original source: React Bits PillNav (converted to TypeScript and adapted for AGUSTIN)
 
-import Image from "next/image";
 import {
   type CSSProperties,
   type ElementType,
@@ -35,10 +34,6 @@ export interface PillNavItem {
 }
 
 export interface PillNavProps {
-  logo?: ReactNode | string;
-  logoAlt?: string;
-  logoHref?: string;
-  onLogoClick?: (event: MouseEvent<HTMLAnchorElement>) => void;
   items?: readonly PillNavItem[];
   activeHref?: string;
   defaultActiveIndex?: number;
@@ -123,7 +118,6 @@ const SIZES: Record<PillNavSize, CssVarMap> = {
     "--pn-x": "8px",
     "--pn-font": "13px",
     "--pn-gap": "5px",
-    "--pn-mark": "18px",
     "--pn-tracking": "0.06em",
   },
   md: {
@@ -133,7 +127,6 @@ const SIZES: Record<PillNavSize, CssVarMap> = {
     "--pn-x": "16px",
     "--pn-font": "14px",
     "--pn-gap": "8px",
-    "--pn-mark": "22px",
     "--pn-tracking": "0.14em",
   },
   lg: {
@@ -143,7 +136,6 @@ const SIZES: Record<PillNavSize, CssVarMap> = {
     "--pn-x": "20px",
     "--pn-font": "15px",
     "--pn-gap": "10px",
-    "--pn-mark": "26px",
     "--pn-tracking": "0.14em",
   },
 };
@@ -152,9 +144,6 @@ const ROOT = "pill-nav";
 const SURFACE = "pill-nav__surface";
 const RIM = "pill-nav__rim";
 const ROOT_RIM = "pill-nav__rim pill-nav__rim--root";
-const LOGO = "pill-nav__logo";
-const LOGO_LINK = "pill-nav__logo-link";
-const MARK = "pill-nav__mark";
 const BAR = "pill-nav__bar";
 const TRACK = "pill-nav__track";
 const LIST = "pill-nav__list";
@@ -214,10 +203,6 @@ const readVar = (element: HTMLElement, name: string): number =>
   Number.parseFloat(getComputedStyle(element).getPropertyValue(name)) || 0;
 
 export default function PillNav({
-  logo,
-  logoAlt = "Logo",
-  logoHref = "#",
-  onLogoClick,
   items = DEFAULT_ITEMS,
   activeHref,
   defaultActiveIndex = 0,
@@ -250,8 +235,6 @@ export default function PillNav({
   const glideRef = useRef<HTMLSpanElement>(null);
   const inkRef = useRef<HTMLDivElement>(null);
   const dotRef = useRef<HTMLSpanElement>(null);
-  const logoRef = useRef<HTMLSpanElement>(null);
-  const markRef = useRef<HTMLSpanElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const measureRef = useRef<HTMLDivElement>(null);
@@ -279,7 +262,6 @@ export default function PillNav({
         : autoCollapsed;
   const effectiveOpen = collapsed ? open : false;
   const joined = layout === "joined";
-  const hasLogo = Boolean(logo);
   const fill = hoverEffect === "fill";
   const glide = !fill && (hoverEffect === "glide" || indicator === "pill");
 
@@ -425,7 +407,7 @@ export default function PillNav({
         const half = (width * scale) / 2;
         const center = (state.x0 + state.x1) / 2;
         const inset = (trackHeight * (1 - scale * squash)) / 2;
-        ink.style.clipPath = `inset(${inset}px ${trackWidth - center - half}px ${inset}px ${center - half}px round ${trackHeight / 2}px)`;
+        ink.style.clipPath = `inset(${inset}px ${trackWidth - center - half}px ${inset}px ${center - half}px)`;
         ink.style.opacity = `${state.alpha}`;
       }
       if (dot) {
@@ -671,13 +653,8 @@ export default function PillNav({
         (Number.parseFloat(styles.paddingLeft) || 0) -
         (Number.parseFloat(styles.paddingRight) || 0);
       const listWidth = measureListRef.current?.offsetWidth ?? 0;
-      const height = readVar(root, "--pn-h");
       const pad = readVar(root, "--pn-pad");
-      const gap = readVar(root, "--pn-gap");
-      const inner = readVar(root, "--pn-inner");
-      const need = joined
-        ? pad * 2 + (hasLogo ? inner + 2 : 0) + listWidth
-        : (hasLogo ? height + gap : 0) + listWidth + pad * 2;
+      const need = listWidth + pad * 2;
       const next = need > available + 0.5;
       if (introRef.current && next !== collapsed) pendingRef.current = next;
       setAutoCollapsed(next);
@@ -692,7 +669,7 @@ export default function PillNav({
       cancelAnimationFrame(rafId);
       observer.disconnect();
     };
-  }, [collapse, collapsed, joined, hasLogo, size]);
+  }, [collapse, collapsed, size]);
 
   useLayoutEffect(() => {
     const root = rootRef.current;
@@ -718,20 +695,15 @@ export default function PillNav({
 
     const reveal = (element: HTMLElement | null) => {
       if (!element) return;
-      const width = element.offsetWidth;
-      const height = element.offsetHeight;
       element.animate(
         [
-          {
-            clipPath: `inset(0px ${Math.max(0, width - height)}px 0px 0px round ${height / 2}px)`,
-          },
-          { clipPath: `inset(0px 0px 0px 0px round ${height / 2}px)` },
+          { clipPath: "inset(0px 100% 0px 0px)" },
+          { clipPath: "inset(0px 0px 0px 0px)" },
         ],
         { duration: 760, delay: 90, easing: EASE_OUT, fill: "backwards" },
       );
     };
 
-    pop(logoRef.current, 0);
     if (collapsed) {
       pop(toggleRef.current, 120);
       return;
@@ -768,9 +740,9 @@ export default function PillNav({
       ? root.offsetHeight
       : (toggleRef.current?.offsetHeight ?? 44);
     const start = joined
-      ? `inset(0px 0px ${Math.max(0, height - header)}px 0px round ${header / 2}px)`
-      : `inset(0px 0px ${Math.max(0, height - header)}px ${Math.max(0, width - header)}px round ${header / 2}px)`;
-    const end = "inset(0px 0px 0px 0px round 24px)";
+      ? `inset(0px 0px ${Math.max(0, height - header)}px 0px)`
+      : `inset(0px 0px ${Math.max(0, height - header)}px ${Math.max(0, width - header)}px)`;
+    const end = "inset(0px 0px 0px 0px)";
     const rows = panel.querySelectorAll("li");
     const running: Animation[] = [];
     let closeRaf = 0;
@@ -852,18 +824,6 @@ export default function PillNav({
     };
   }, [effectiveOpen]);
 
-  const spin = (event: PointerEvent<HTMLAnchorElement>) => {
-    const mark = markRef.current;
-    if (!mark || event.pointerType === "touch" || mark.getAnimations().length) {
-      return;
-    }
-    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
-    mark.animate(
-      [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }],
-      { duration: 900, easing: "cubic-bezier(0.65, 0, 0.25, 1)" },
-    );
-  };
-
   const choose = (
     item: PillNavItem,
     index: number,
@@ -913,8 +873,6 @@ export default function PillNav({
     </>
   );
 
-  const LogoTag = LinkComponent;
-
   return (
     <nav
       ref={rootRef}
@@ -929,36 +887,6 @@ export default function PillNav({
       style={{ ...vars, ...style } as CSSProperties}
       aria-label={ariaLabel}
     >
-      {logo && (
-        <span
-          ref={logoRef}
-          className={[LOGO, joined ? "" : SURFACE].filter(Boolean).join(" ")}
-        >
-          <LogoTag
-            href={logoHref}
-            className={LOGO_LINK}
-            aria-label={logoAlt}
-            onPointerEnter={spin}
-            onClick={onLogoClick}
-          >
-            <span ref={markRef} className={MARK}>
-              {typeof logo === "string" ? (
-                <Image
-                  src={logo}
-                  alt=""
-                  width={26}
-                  height={26}
-                  draggable={false}
-                  referrerPolicy="no-referrer"
-                />
-              ) : (
-                logo
-              )}
-            </span>
-          </LogoTag>
-          {!joined && <span className={RIM} />}
-        </span>
-      )}
 
       {!collapsed && (
         <div

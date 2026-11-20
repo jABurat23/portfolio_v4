@@ -1,6 +1,6 @@
 "use client";
 
-import { MouseScrollIcon } from "@phosphor-icons/react/dist/ssr/MouseScroll";
+import { TriangleIcon } from "@phosphor-icons/react/dist/ssr/Triangle";
 import { useEffect, useRef } from "react";
 import { journeyConfig } from "@/config/journey";
 import { siteConfig } from "@/config/site";
@@ -70,12 +70,12 @@ export default function Hero({ visible }: HeroProps) {
       </header>
 
       <div ref={hintRef} className="flex justify-center pb-12 sm:pb-12">
-        <span className="border border-line bg-background p-2">
-          <MouseScrollIcon
-            size={22}
-            weight="light"
+        <span className="bg-background p-2">
+          <TriangleIcon
+            size={12}
+            weight="fill"
             aria-hidden="true"
-            className="block text-ink motion-safe:animate-scroll-bob"
+            className="block rotate-180 text-ink motion-safe:animate-triangle-blink"
           />
         </span>
       </div>

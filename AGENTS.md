@@ -29,9 +29,9 @@ Standing project rules for the **AGUSTIN** portfolio. All future work must follo
 
 ## 3. Design System
 
-- Dark theme only (`#0A0A0A` background, `#F2F2F2` ink, `#7A7A7A` muted, `#2A2A2A` line).
-- Sharp corners everywhere (`border-radius: 0`).
-- `1px` hairline borders only (`#2A2A2A`).
+- Dark theme only (`#0A0A0A` background, `#F2F2F2` ink, `#7A7A7A` muted, `#2A2A2A` line, `#4A4A4A` strong line).
+- Sharp corners everywhere (`border-radius: 0`, no exceptions, including navigation).
+- `1px` hairline borders only (`#2A2A2A` inner dividers, `#4A4A4A` outer boundaries).
 - No box shadows and no gradients.
 - Typography: `JetBrains Mono` for ASCII headers, labels, and UI details; `Inter` for body text.
 - Two-tone dithered aesthetic in 3D scenes.

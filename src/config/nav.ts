@@ -11,9 +11,6 @@ export interface NavItemConfig {
 
 export interface NavConfig {
   ariaLabel: string;
-  logoSrc: string;
-  logoAlt: string;
-  logoHref: string;
   narrowBreakpointPx: number;
   bottomSpacingPx: number;
   items: readonly NavItemConfig[];
@@ -24,12 +21,12 @@ function computeWorksTargetProgress(): number {
   const count = worksConfig.items.length;
   if (count === 0) return corridorRange.startProgress;
 
-  // Waypoints: entry (0) + frames (count) + exit (1); first frame rests at segment 2.
+  // Waypoints: entry (0) + stops (count) + exit (1); first stop rests at segment 2.
   const segments = count + 2;
-  const firstFrameLocal = 2 / segments;
+  const firstStopLocal = 2 / segments;
   return (
     corridorRange.startProgress +
-    firstFrameLocal * (corridorRange.endProgress - corridorRange.startProgress)
+    firstStopLocal * (corridorRange.endProgress - corridorRange.startProgress)
   );
 }
 
@@ -56,9 +53,6 @@ function computeContactTargetProgress(): number {
 
 export const navConfig: NavConfig = {
   ariaLabel: "Main",
-  logoSrc: "/icon.svg",
-  logoAlt: "Back to start",
-  logoHref: "#home",
   narrowBreakpointPx: 768,
   bottomSpacingPx: 16,
   items: [

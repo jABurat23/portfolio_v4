@@ -17,6 +17,8 @@
   --radius-3xl: 0px;
   --radius-4xl: 0px;
   --radius-full: 0px;
+
+  --animate-triangle-blink: triangle-blink 1.4s ease-in-out infinite;
 }
 
 @theme inline {
@@ -43,20 +45,14 @@
   }
 }
 
-@keyframes scroll-bob {
+@keyframes triangle-blink {
   0%,
   100% {
-    opacity: 0.4;
-    transform: translate3d(0, -3px, 0);
+    opacity: 1;
   }
   50% {
-    opacity: 1;
-    transform: translate3d(0, 3px, 0);
+    opacity: 0.18;
   }
-}
-
-.animate-scroll-bob {
-  animation: scroll-bob 2.6s ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
