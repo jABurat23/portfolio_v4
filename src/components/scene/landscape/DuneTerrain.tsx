@@ -5,7 +5,11 @@ import { PlaneGeometry } from "three";
 import { landscapeConfig } from "@/config/landscape";
 import { getTerrainBounds, sampleTerrainHeight } from "./terrainMath";
 
-export default function DuneTerrain() {
+export interface DuneTerrainProps {
+  shadowsEnabled?: boolean;
+}
+
+export default function DuneTerrain({ shadowsEnabled = true }: DuneTerrainProps) {
   const geometry = useMemo(() => {
     const { width, segmentsX, segmentsZ } = landscapeConfig.terrain;
     const { minZ, maxZ } = getTerrainBounds();
@@ -36,7 +40,11 @@ export default function DuneTerrain() {
   }, [geometry]);
 
   return (
-    <mesh geometry={geometry} receiveShadow castShadow>
+    <mesh
+      geometry={geometry}
+      receiveShadow={shadowsEnabled}
+      castShadow={shadowsEnabled}
+    >
       <meshStandardMaterial color="#e8e8e8" roughness={0.95} metalness={0} />
     </mesh>
   );

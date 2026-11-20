@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.13.1] - 2026-11-20
+
+### Added
+
+- `?shadows=0` and `?shadows=1` test query parameter (`src/config/quality.ts`, `src/lib/quality.ts`, `src/components/scene/SceneCanvas.tsx`, `src/components/scene/landscape/LandscapeScene.tsx`, `src/components/scene/landscape/DuneTerrain.tsx`, `src/components/scene/QualityController.tsx`, `README.md`) to toggle terrain shadow casting and receiving independently of quality tier and DPR.
+
+### Changed
+
+- Removed the dark backing plate behind the Hero blinking `TriangleIcon` (`src/components/ui/Hero.tsx`) and added a `1.5px` `#0A0A0A` outside SVG stroke painted behind the fill (`paintOrder: "stroke fill"`), keeping the centered position above the navbar, scroll fade-out, and reduced-motion static state.
+- Removed all visible borders, rim overlay elements (`pill-nav__rim`), `--pn-edge` tokens, outlines, and box-shadows from the floating navbar (`src/components/ui/PillNav/PillNav.tsx`, `src/components/ui/PillNav/PillNav.css`), keeping only the `2px` `:focus-visible` keyboard ring and updating `AGENTS.md` and `README.md` accordingly.
+
 ## [0.13.0] - 2026-11-19
 
 ### Changed

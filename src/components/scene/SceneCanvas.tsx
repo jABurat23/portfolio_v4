@@ -4,7 +4,11 @@ import { Canvas } from "@react-three/fiber";
 import { type RefObject, useEffect, useMemo, useRef, useState } from "react";
 import { PCFShadowMap } from "three";
 import { landscapeConfig } from "@/config/landscape";
-import { getQualityTierSpec, resolveInitialQuality } from "@/lib/quality";
+import {
+  getQualityTierSpec,
+  resolveEffectiveShadows,
+  resolveInitialQuality,
+} from "@/lib/quality";
 import CameraRig from "./CameraRig";
 import DitherPass from "./DitherPass";
 import LandscapeScene from "./landscape/LandscapeScene";
@@ -31,6 +35,10 @@ export default function SceneCanvas({
 
   const initialQuality = useMemo(() => resolveInitialQuality(), []);
   const initialTierSpec = getQualityTierSpec(initialQuality.tier);
+  const initialShadows = resolveEffectiveShadows(
+    initialTierSpec,
+    initialQuality.shadowOverride,
+  );
 
   useEffect(() => {
     onContextLostRef.current = onContextLost;
@@ -62,7 +70,7 @@ export default function SceneCanvas({
   return (
     <Canvas
       aria-hidden="true"
-      shadows={initialTierSpec.shadowsEnabled ? { type: PCFShadowMap } : false}
+      shadows={initialShadows.enabled ? { type: PCFShadowMap } : false}
       dpr={[1, initialTierSpec.maxDpr]}
       frameloop={isTabVisible ? "always" : "never"}
       camera={{
@@ -88,13 +96,14 @@ export default function SceneCanvas({
     >
       <CameraRig />
       <LandscapeScene
-        initialShadowsEnabled={initialTierSpec.shadowsEnabled}
-        initialShadowMapSize={initialTierSpec.shadowMapSize}
+        initialShadowsEnabled={initialShadows.enabled}
+        initialShadowMapSize={initialShadows.mapSize}
       />
       <VoidScene />
       <QualityController
         initialTier={initialQuality.tier}
         forced={initialQuality.forced}
+        shadowOverride={initialQuality.shadowOverride}
         monitoringEnabled={introDone}
         isTabVisible={isTabVisible}
       />

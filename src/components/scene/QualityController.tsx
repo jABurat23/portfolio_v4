@@ -6,15 +6,22 @@ import {
   DirectionalLight,
   type Material,
   Mesh,
+  MeshStandardMaterial,
   type Scene,
   type WebGLRenderer,
 } from "three";
 import { type QualityTierIndex, qualityConfig } from "@/config/quality";
-import { getQualityTierSpec, saveQualityTier } from "@/lib/quality";
+import {
+  getQualityTierSpec,
+  resolveEffectiveShadows,
+  saveQualityTier,
+  type ShadowOverride,
+} from "@/lib/quality";
 
 export interface QualityControllerProps {
   initialTier: QualityTierIndex;
   forced: boolean;
+  shadowOverride: ShadowOverride;
   monitoringEnabled: boolean;
   isTabVisible: boolean;
 }
@@ -39,18 +46,26 @@ function applyTierToScene(
   scene: Scene,
   setDpr: (dpr: number) => void,
   tier: QualityTierIndex,
+  shadowOverride: ShadowOverride,
 ): void {
   const spec = getQualityTierSpec(tier);
+  const shadows = resolveEffectiveShadows(spec, shadowOverride);
   const targetDpr = Math.min(window.devicePixelRatio || 1, spec.maxDpr);
   setDpr(targetDpr);
 
   const prevShadowsEnabled = gl.shadowMap.enabled;
-  gl.shadowMap.enabled = spec.shadowsEnabled;
+  gl.shadowMap.enabled = shadows.enabled;
 
   scene.traverse((obj) => {
+    if (obj instanceof Mesh && obj.material instanceof MeshStandardMaterial) {
+      obj.castShadow = shadows.enabled;
+      obj.receiveShadow = shadows.enabled;
+      return;
+    }
+
     if (!(obj instanceof DirectionalLight)) return;
 
-    if (!spec.shadowsEnabled) {
+    if (!shadows.enabled) {
       obj.castShadow = false;
       if (obj.shadow.map) {
         obj.shadow.map.dispose();
@@ -59,20 +74,20 @@ function applyTierToScene(
     } else {
       obj.castShadow = true;
       if (
-        obj.shadow.mapSize.x !== spec.shadowMapSize ||
-        obj.shadow.mapSize.y !== spec.shadowMapSize
+        obj.shadow.mapSize.x !== shadows.mapSize ||
+        obj.shadow.mapSize.y !== shadows.mapSize
       ) {
         if (obj.shadow.map) {
           obj.shadow.map.dispose();
           obj.shadow.map = null;
         }
-        obj.shadow.mapSize.set(spec.shadowMapSize, spec.shadowMapSize);
+        obj.shadow.mapSize.set(shadows.mapSize, shadows.mapSize);
         obj.shadow.needsUpdate = true;
       }
     }
   });
 
-  if (prevShadowsEnabled !== spec.shadowsEnabled) {
+  if (prevShadowsEnabled !== shadows.enabled) {
     markSceneMaterialsDirty(scene);
   }
 
@@ -82,6 +97,7 @@ function applyTierToScene(
 export default function QualityController({
   initialTier,
   forced,
+  shadowOverride,
   monitoringEnabled,
   isTabVisible,
 }: QualityControllerProps) {
@@ -95,8 +111,8 @@ export default function QualityController({
   const lastStepMsRef = useRef<number>(-Infinity);
 
   useEffect(() => {
-    applyTierToScene(gl, scene, setDpr, tierRef.current);
-  }, [gl, scene, setDpr]);
+    applyTierToScene(gl, scene, setDpr, tierRef.current, shadowOverride);
+  }, [gl, scene, setDpr, shadowOverride]);
 
   useEffect(() => {
     lastFrameMsRef.current = null;
@@ -169,7 +185,7 @@ export default function QualityController({
       lowStreakRef.current = 0;
       lastStepMsRef.current = now;
       saveQualityTier(nextTier);
-      applyTierToScene(gl, scene, setDpr, nextTier);
+      applyTierToScene(gl, scene, setDpr, nextTier, shadowOverride);
     }
   });
 

@@ -79,7 +79,7 @@ export default function LandscapeScene({
         shadow-normalBias={light.shadowNormalBias}
       />
 
-      <DuneTerrain />
+      <DuneTerrain shadowsEnabled={initialShadowsEnabled} />
     </>
   );
 }

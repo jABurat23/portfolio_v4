@@ -14,6 +14,7 @@ export interface QualityConfig {
   tiers: readonly [QualityTierSpec, QualityTierSpec, QualityTierSpec];
   defaultTier: QualityTierIndex;
   queryParam: string;
+  shadowQueryParam: string;
   sessionStorageKey: string;
   warmupMs: number;
   sampleWindowMs: number;
@@ -46,6 +47,7 @@ export const qualityConfig: QualityConfig = {
   ],
   defaultTier: 0,
   queryParam: "quality",
+  shadowQueryParam: "shadows",
   sessionStorageKey: "agustin_quality_tier",
   warmupMs: 3500,
   sampleWindowMs: 1000,

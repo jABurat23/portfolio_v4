@@ -85,7 +85,6 @@ const THEMES: Record<PillNavTheme, CssVarMap> = {
   dark: {
     "--pn-surface": "#0A0A0A",
     "--pn-solid": "#0A0A0A",
-    "--pn-edge": "#4A4A4A",
     "--pn-text": "#7A7A7A",
     "--pn-strong": "#F2F2F2",
     "--pn-pill": "#F2F2F2",
@@ -98,7 +97,6 @@ const THEMES: Record<PillNavTheme, CssVarMap> = {
   light: {
     "--pn-surface": "#F2F2F2",
     "--pn-solid": "#F2F2F2",
-    "--pn-edge": "#4A4A4A",
     "--pn-text": "#7A7A7A",
     "--pn-strong": "#0A0A0A",
     "--pn-pill": "#0A0A0A",
@@ -142,8 +140,6 @@ const SIZES: Record<PillNavSize, CssVarMap> = {
 
 const ROOT = "pill-nav";
 const SURFACE = "pill-nav__surface";
-const RIM = "pill-nav__rim";
-const ROOT_RIM = "pill-nav__rim pill-nav__rim--root";
 const BAR = "pill-nav__bar";
 const TRACK = "pill-nav__track";
 const LIST = "pill-nav__list";
@@ -294,7 +290,6 @@ export default function PillNav({
   }
   if (surface === "none") {
     vars["--pn-surface"] = "transparent";
-    vars["--pn-edge"] = "transparent";
   }
   if (barColor) {
     vars["--pn-surface"] = barColor;
@@ -951,7 +946,6 @@ export default function PillNav({
               <span ref={dotRef} className={DOT} aria-hidden="true" />
             )}
           </div>
-          {!joined && <span className={RIM} />}
         </div>
       )}
 
@@ -969,7 +963,6 @@ export default function PillNav({
             <span className={LINE_TOP} />
             <span className={LINE_BOTTOM} />
           </span>
-          {!joined && <span className={RIM} />}
         </button>
       )}
 
@@ -999,7 +992,6 @@ export default function PillNav({
               </li>
             ))}
           </ul>
-          <span className={RIM} />
         </div>
       )}
 
@@ -1012,8 +1004,6 @@ export default function PillNav({
           ))}
         </div>
       </div>
-
-      {joined && <span className={ROOT_RIM} />}
     </nav>
   );
 }

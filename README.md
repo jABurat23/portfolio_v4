@@ -56,6 +56,7 @@ The site is a static-capable Next.js App Router portfolio with zero required run
 - `?intro=1` — Replay the Bayer intro sequence even if it has already played in the current browser session.
 - `?fallback=1` — Force the static zero-3D fallback page (skips downloading Three.js, React Three Fiber, GSAP, and Lenis bundles).
 - `?quality=0`, `?quality=1`, or `?quality=2` — Force a specific rendering quality tier (disables automatic FPS step-down for the load).
+- `?shadows=0` or `?shadows=1` — Force terrain shadow casting and receiving off (`0`) or on (`1`) without changing DPR, pixel size, or any other setting (works together with `?quality=`).
 
 ## Intro & Adaptive Quality Settings
 
@@ -77,7 +78,7 @@ All scroll zones, lengths, and camera waypoints live in `src/config/journey.ts`.
   - Opening the site with `#home`, `#works`, `#about`, or `#contact` skips the intro once the 3D scene is ready and jumps directly to the matching section (reusing `getNavTargetProgressForHash()`). Unknown hashes fall back to the normal intro; combining `?intro=1` with a valid hash plays the intro first before jumping to that hash target. Matching section IDs (`#home`, `#about`, `#works`, `#contact`) are also wired on `FallbackView`.
   - `SiteNavbar` renders a sharp (`border-radius: 0`), logo-free bar that switches cleanly between `sm` (`< 768px`, sized to fit narrow viewports down to `320px` with `13px` labels) and `md` (`>= 768px`) without collapsing to a menu button (`collapse="never"`).
 - **Phosphor Icons (`@phosphor-icons/react`):**
-  - `TriangleIcon` (`@phosphor-icons/react/dist/ssr/Triangle`, `fill` weight, rotated `180deg`, `12px` in `IntroOverlay` entry button subtitle and `Hero` backing plate) — animated with `triangle-blink` (`src/app/globals.css`, static at full opacity under `prefers-reduced-motion`).
+  - `TriangleIcon` (`@phosphor-icons/react/dist/ssr/Triangle`, `fill` weight, rotated `180deg`, `12px` in `IntroOverlay` entry button subtitle and directly over the canvas in `Hero` with a `#0A0A0A` outside SVG stroke) — animated with `triangle-blink` (`src/app/globals.css`, static at full opacity under `prefers-reduced-motion`).
   - `ArrowUpRightIcon` (`@phosphor-icons/react/dist/ssr/ArrowUpRight`, `regular` weight, `14px`) — external link indicator on Contact rows (`VoidPanels`, `FallbackView`) and `"VIEW PROJECT"` buttons (`ProjectCard`, `FallbackView`).
 
 ## Adding a Project
@@ -104,7 +105,7 @@ All closing Void zone text, links, particle counts, and panel fade timings live 
 
 - **Site Title, Description & URL (`src/config/site.ts`, `src/app/layout.tsx`):** update `siteConfig.title`, `siteConfig.description`, `siteConfig.url` (used as `metadataBase` and Open Graph canonical URL), and `siteConfig.ogImage`.
 - **Social Preview Image (`public/og.png`):** replace `public/og.png` (`1200×630` PNG) to update Open Graph and `summary_large_image` Twitter link previews.
-- **Border Tokens (`src/app/globals.css`):** `--color-line-strong` (`#4A4A4A`, `border-line-strong`) styles outer component boundaries (buttons, cards, `AsciiFrame`, `PillNav` borders), while `--color-line` (`#2A2A2A`, `border-line`) is reserved for decorative dividers and inner rules.
+- **Border Tokens (`src/app/globals.css`):** `--color-line-strong` (`#4A4A4A`, `border-line-strong`) styles outer component boundaries (`OutlinedButton`, `ProjectCard`, `AsciiFrame`), while `--color-line` (`#2A2A2A`, `border-line`) is reserved for decorative dividers and inner rules. The floating navbar (`SiteNavbar`) intentionally has no border.
 
 ## Credits
 

@@ -69,15 +69,17 @@ export default function Hero({ visible }: HeroProps) {
         </div>
       </header>
 
-      <div ref={hintRef} className="flex justify-center pb-12 sm:pb-12">
-        <span className="bg-background p-2">
-          <TriangleIcon
-            size={12}
-            weight="fill"
-            aria-hidden="true"
-            className="block rotate-180 text-ink motion-safe:animate-triangle-blink"
-          />
-        </span>
+      <div ref={hintRef} className="flex justify-center pb-14">
+        <TriangleIcon
+          size={12}
+          weight="fill"
+          aria-hidden="true"
+          stroke="#0A0A0A"
+          strokeWidth={64}
+          strokeLinejoin="round"
+          style={{ paintOrder: "stroke fill" }}
+          className="block rotate-180 overflow-visible text-ink motion-safe:animate-triangle-blink"
+        />
       </div>
     </section>
   );
