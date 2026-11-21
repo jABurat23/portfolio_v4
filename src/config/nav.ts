@@ -9,10 +9,25 @@ export interface NavItemConfig {
   targetProgress: number;
 }
 
+export interface NavIdleConfig {
+  scale: number;
+  touchScale: number;
+  labelOpacity: number;
+  fadeSurface: boolean;
+  transitionMs: number;
+  introHintMs: number;
+  hoverLeaveDelayMs: number;
+  focusLeaveDelayMs: number;
+  touchRestDelayMs: number;
+  hitPaddingPx: number;
+  queryParam: string;
+}
+
 export interface NavConfig {
   ariaLabel: string;
   narrowBreakpointPx: number;
   bottomSpacingPx: number;
+  idle: NavIdleConfig;
   items: readonly NavItemConfig[];
 }
 
@@ -55,6 +70,19 @@ export const navConfig: NavConfig = {
   ariaLabel: "Main",
   narrowBreakpointPx: 768,
   bottomSpacingPx: 16,
+  idle: {
+    scale: 0.82,
+    touchScale: 0.9,
+    labelOpacity: 0.45,
+    fadeSurface: false,
+    transitionMs: 260,
+    introHintMs: 2500,
+    hoverLeaveDelayMs: 350,
+    focusLeaveDelayMs: 150,
+    touchRestDelayMs: 2500,
+    hitPaddingPx: 12,
+    queryParam: "nav",
+  },
   items: [
     {
       id: "home",
@@ -106,4 +134,16 @@ export function getActiveNavHref(progress: number): string {
   }
 
   return "#home";
+}
+
+export type NavDockPinState = "awake" | "idle" | null;
+
+export function parseNavQueryOverride(search?: string): NavDockPinState {
+  if (typeof window === "undefined" && search === undefined) return null;
+  const raw = new URLSearchParams(search ?? window.location.search).get(
+    navConfig.idle.queryParam,
+  );
+  if (raw === "idle") return "idle";
+  if (raw === "awake") return "awake";
+  return null;
 }

@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.14.0] - 2026-11-20
+
+### Added
+
+- Idle shrink-and-fade floating navbar behavior (`src/config/nav.ts`, `src/components/ui/SiteNavbar.tsx`, `src/components/ui/PillNav/PillNav.css`): holds awake for `introHintMs` (`2500ms`) after intro completion, settles to `idle` (`0.82` scale on fine pointers, `0.9` scale on coarse touch pointers, bottom-center `transform-origin`, `0.45` label/dot opacity over an opaque `#0A0A0A` surface by default via `fadeSurface: false`), wakes cleanly across `260ms` ease-out transitions on pointer enter (including `12px` transparent hit padding with `350ms` leave delay), keyboard focus (`150ms` leave delay), or touch tap (`pointerdown` waking synchronously before `click`, `2500ms` rest delay), and switches to instant opacity-only idle dimming (`scale: 1`) under `prefers-reduced-motion`.
+- `?nav=idle` and `?nav=awake` test query parameters (`src/config/nav.ts`, `src/components/ui/SiteNavbar.tsx`, `README.md`) to pin the navbar state for inspection, plus updated accessibility contrast documentation in `AGENTS.md` and `README.md`.
+
 ## [0.13.1] - 2026-11-20
 
 ### Added

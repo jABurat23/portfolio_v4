@@ -46,6 +46,7 @@ Standing project rules for the **AGUSTIN** portfolio. All future work must follo
 - Use semantic HTML landmarks and elements (`main`, `section`, `header`, `button`, `a`).
 - Ensure full keyboard navigability and visible focus indicators.
 - Respect `prefers-reduced-motion` in both CSS and 3D/animation loops.
+- Idle navbar labels use reduced opacity (`0.45`) and low contrast by design when resting; pointer hover, touch, and keyboard focus restore full `1.0` contrast immediately.
 
 ## 6. Versioning
 

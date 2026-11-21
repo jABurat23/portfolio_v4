@@ -1,5 +1,56 @@
 /* Original source: React Bits PillNav (flattened to AGUSTIN hairline design system) */
 
+.pill-nav-dock {
+  --pn-idle-scale: 0.82;
+  --pn-idle-touch-scale: 0.9;
+  --pn-idle-opacity: 0.45;
+  --pn-idle-ms: 260ms;
+  --pn-hit-pad: 12px;
+  --pn-dock-scale: 1;
+  position: relative;
+  max-width: 100%;
+  transform: scale(var(--pn-dock-scale));
+  transform-origin: 50% 100%;
+  transition: transform var(--pn-idle-ms) cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.pill-nav-dock::before {
+  content: "";
+  position: absolute;
+  inset: calc(var(--pn-hit-pad) / var(--pn-dock-scale) * -1);
+  z-index: 0;
+  pointer-events: auto;
+}
+
+.pill-nav-dock > .pill-nav {
+  position: relative;
+  z-index: 1;
+}
+
+.pill-nav-dock[data-nav-state="idle"] {
+  --pn-dock-scale: var(--pn-idle-scale);
+}
+
+@media (pointer: coarse) {
+  .pill-nav-dock[data-nav-state="idle"] {
+    --pn-dock-scale: var(--pn-idle-touch-scale);
+  }
+}
+
+.pill-nav-dock .pill-nav__bar,
+.pill-nav-dock .pill-nav__track {
+  transition: opacity var(--pn-idle-ms) cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.pill-nav-dock[data-nav-state="idle"]:not([data-fade-surface="true"]) .pill-nav__track {
+  opacity: var(--pn-idle-opacity);
+}
+
+.pill-nav-dock[data-nav-state="idle"][data-fade-surface="true"] .pill-nav__bar {
+  opacity: var(--pn-idle-opacity);
+}
+
 .pill-nav {
   --pn-roll: calc(var(--pn-inner) / 2 + 0.7em);
   position: relative;
@@ -397,6 +448,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .pill-nav-dock,
+  .pill-nav-dock .pill-nav__bar,
+  .pill-nav-dock .pill-nav__track,
   .pill-nav__face,
   .pill-nav__face-alt,
   .pill-nav__fill,
@@ -404,5 +458,13 @@
   .pill-nav__item,
   .pill-nav__row {
     transition: none;
+  }
+
+  .pill-nav-dock {
+    will-change: auto;
+  }
+
+  .pill-nav-dock[data-nav-state="idle"] {
+    --pn-dock-scale: 1;
   }
 }
