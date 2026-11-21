@@ -4,6 +4,7 @@ import {
   type QualityTierSpec,
   qualityConfig,
 } from "@/config/quality";
+import { skyConfig } from "@/config/sky";
 
 export type ShadowOverride = boolean | null;
 
@@ -92,4 +93,10 @@ export function saveQualityTier(tier: QualityTierIndex): void {
   } catch {
     // Ignore sessionStorage errors in restricted contexts.
   }
+}
+
+export function resolveStarsEnabled(): boolean {
+  if (typeof window === "undefined") return true;
+  const params = new URLSearchParams(window.location.search);
+  return params.get(skyConfig.queryParam) !== "0";
 }

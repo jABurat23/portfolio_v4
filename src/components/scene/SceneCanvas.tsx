@@ -1,18 +1,29 @@
 "use client";
 
 import { Canvas } from "@react-three/fiber";
-import { type RefObject, useEffect, useMemo, useRef, useState } from "react";
+import {
+  type RefObject,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { PCFShadowMap } from "three";
 import { landscapeConfig } from "@/config/landscape";
+import { type QualityTierSpec } from "@/config/quality";
+import { skyConfig } from "@/config/sky";
 import {
   getQualityTierSpec,
   resolveEffectiveShadows,
   resolveInitialQuality,
+  resolveStarsEnabled,
 } from "@/lib/quality";
 import CameraRig from "./CameraRig";
 import DitherPass from "./DitherPass";
 import LandscapeScene from "./landscape/LandscapeScene";
 import QualityController from "./QualityController";
+import SkyStars from "./sky/SkyStars";
 import VoidScene from "./void/VoidScene";
 
 export interface SceneCanvasProps {
@@ -34,11 +45,17 @@ export default function SceneCanvas({
   const onContextLostRef = useRef(onContextLost);
 
   const initialQuality = useMemo(() => resolveInitialQuality(), []);
+  const starsEnabled = useMemo(() => resolveStarsEnabled(), []);
   const initialTierSpec = getQualityTierSpec(initialQuality.tier);
+  const starMultiplierRef = useRef(initialTierSpec.starCountMultiplier);
   const initialShadows = resolveEffectiveShadows(
     initialTierSpec,
     initialQuality.shadowOverride,
   );
+
+  const handleTierChange = useCallback((spec: QualityTierSpec) => {
+    starMultiplierRef.current = spec.starCountMultiplier;
+  }, []);
 
   useEffect(() => {
     onContextLostRef.current = onContextLost;
@@ -77,7 +94,7 @@ export default function SceneCanvas({
         position: [camX, camY, camZ],
         fov: landscapeConfig.camera.fov,
         near: 0.1,
-        far: 150,
+        far: skyConfig.cameraFar,
       }}
       className="h-full w-full"
       onCreated={({ gl }) => {
@@ -95,6 +112,9 @@ export default function SceneCanvas({
       }}
     >
       <CameraRig />
+      {starsEnabled ? (
+        <SkyStars qualityMultiplierRef={starMultiplierRef} />
+      ) : null}
       <LandscapeScene
         initialShadowsEnabled={initialShadows.enabled}
         initialShadowMapSize={initialShadows.mapSize}
@@ -106,6 +126,7 @@ export default function SceneCanvas({
         shadowOverride={initialQuality.shadowOverride}
         monitoringEnabled={introDone}
         isTabVisible={isTabVisible}
+        onTierChange={handleTierChange}
       />
       <DitherPass thresholdBiasRef={thresholdBiasRef} />
     </Canvas>

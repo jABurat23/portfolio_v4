@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.15.0] - 2026-11-21
+
+### Added
+
+- Distant two-tone dithered sky starfield (`src/components/scene/sky/SkyStars.tsx`, `src/config/sky.ts`, mounted in `src/components/scene/SceneCanvas.tsx`) spanning Hero through Void behind `VoidField`: renders sky-only `THREE.Points` (`sizeAttenuation` off) vertex-snapped onto `DitherPass`'s Bayer pixel grid (`85%` `1×1` cells and `15%` `2×2` cells locked to `ditherConfig.pixelSize` and active DPR), interpolates star count smoothly across journey zone keyframes (`140` Landscape start → `320` Corridor start → `620` Void start → `820` Void end on desktop; `0.55×` on narrow viewports `<768px`), drifts slowly while staying static under `prefers-reduced-motion`, and disposes geometry and shader material on unmount.
+- Adaptive quality star scaling (`starCountMultiplier`: `1` at tier 0, `0.6` at tier 1, `0.35` at tier 2 in `src/config/quality.ts`, propagated via `QualityController` `onTierChange` without React re-renders) and `?stars=0` / `?stars=1` test query parameter (`resolveStarsEnabled` in `src/lib/quality.ts`).
+
+### Changed
+
+- Raised `SceneCanvas` camera `far` plane to `skyConfig.cameraFar` (`220`) to clear the `domeRadius: 135` sky sphere.
+- Documented `src/config/sky.ts`, quality tier star multipliers, reduced-motion static sky behavior, and `?stars=0` / `?stars=1` in `README.md`.
+
 ## [0.14.0] - 2026-11-20
 
 ### Added

@@ -8,6 +8,7 @@ export interface QualityTierSpec {
   maxDpr: number;
   shadowsEnabled: boolean;
   shadowMapSize: number;
+  starCountMultiplier: number;
 }
 
 export interface QualityConfig {
@@ -31,18 +32,21 @@ export const qualityConfig: QualityConfig = {
       maxDpr: ditherConfig.maxDpr,
       shadowsEnabled: true,
       shadowMapSize: landscapeConfig.light.shadowMapSize,
+      starCountMultiplier: 1,
     },
     {
       tier: 1,
       maxDpr: 1,
       shadowsEnabled: true,
       shadowMapSize: 512,
+      starCountMultiplier: 0.6,
     },
     {
       tier: 2,
       maxDpr: 1,
       shadowsEnabled: false,
       shadowMapSize: 0,
+      starCountMultiplier: 0.35,
     },
   ],
   defaultTier: 0,

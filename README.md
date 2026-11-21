@@ -57,12 +57,13 @@ The site is a static-capable Next.js App Router portfolio with zero required run
 - `?fallback=1` — Force the static zero-3D fallback page (skips downloading Three.js, React Three Fiber, GSAP, and Lenis bundles).
 - `?quality=0`, `?quality=1`, or `?quality=2` — Force a specific rendering quality tier (disables automatic FPS step-down for the load).
 - `?shadows=0` or `?shadows=1` — Force terrain shadow casting and receiving off (`0`) or on (`1`) without changing DPR, pixel size, or any other setting (works together with `?quality=`).
+- `?stars=0` or `?stars=1` — Force distant sky stars off (`0`) or on (`1`, default) for comparison (works together with `?quality=`).
 - `?nav=idle` or `?nav=awake` — Pin the floating navbar in its resting (`idle`) or expanded (`awake`) state for side-by-side comparison.
 
 ## Intro & Adaptive Quality Settings
 
 - **Intro inputs & tuning:** once the 4-second Bayer reveal completes, any of the following enters the 3D scene: mouse wheel or small trackpad scroll deltas (in either direction), touch swipe or tap, clicking or tapping anywhere on the intro dialog, or pressing `Enter`, `Space`, `ArrowDown`, or `PageDown` (with `prefers-reduced-motion`, click/activate the static `ENTER` button). Tune timing and thresholds in `src/config/intro.ts` (`revealDurationMs`, `revealHaloRadiusCells`, `startSpeckleDensity`, `maxSpeckleDensity`, `dissolveDurationMs`, `wheelThresholdPx`, `readyFailsafeMs`).
-- **Quality tiers:** edit `src/config/quality.ts` (`tiers` for DPR cap and shadow map size/toggle, plus `warmupMs`, `sampleWindowMs`, `fpsThreshold`, `consecutiveLowSamplesRequired`, and `cooldownMs`). The chosen tier persists per browser session in `sessionStorage`.
+- **Quality tiers:** edit `src/config/quality.ts` (`tiers` for DPR cap, shadow map size/toggle, and `starCountMultiplier`, plus `warmupMs`, `sampleWindowMs`, `fpsThreshold`, `consecutiveLowSamplesRequired`, and `cooldownMs`). The chosen tier persists per browser session in `sessionStorage`.
 
 ## Adding a Journey Zone
 
@@ -102,6 +103,7 @@ All closing Void zone text, links, particle counts, and panel fade timings live 
 - **About copy:** edit `aboutConfig` in `src/config/about.ts`.
 - **Contact links & button text:** edit `contactConfig.items` (`label`, `text`, `href`, `external`) and `backToStartLabel` in `src/config/contact.ts`. External links automatically open in a new tab with `rel="noopener noreferrer"`.
 - **Void density & timing:** edit `voidConfig` in `src/config/void.ts` (`scrollVh`, desktop/mobile dot and dotted-line counts, drift speed, and scroll-progress fade windows for About, Contact, and `"BACK TO START"`).
+- **Sky stars (`src/config/sky.ts`, `src/components/scene/sky/SkyStars.tsx`):** distant sky-only stars follow `camera.position` (zero parallax) across the Hero, Landscape, Corridor, and Void behind `VoidField`. Vertex snapping locks `1×1` (`85%`) and `2×2` (`15%`) star quads onto `DitherPass`'s Bayer sample grid at `ditherConfig.pixelSize * dpr`. Edit `src/config/sky.ts` for `seed`, `domeRadius` (`135`), `cameraFar` (`220`), `minElevationDeg` (`-10`), `maxElevationDeg` (`42`), `twoCellRatio` (`0.15`), `narrowBreakpointPx` (`768`), `narrowCountScale` (`0.55`), `driftRadiansPerSec` (`0.0025`), `queryParam` (`"stars"`), and per-zone `keyframes` (`140` Landscape start → `320` Corridor start → `620` Void start → `820` Void end on desktop). Star counts scale by `qualityConfig.tiers[tier].starCountMultiplier` (`1`, `0.6`, `0.35`), and rotation stops completely under `prefers-reduced-motion`.
 
 ## Metadata, Preview Image & Theme Tokens
 

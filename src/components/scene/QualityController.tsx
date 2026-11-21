@@ -10,7 +10,11 @@ import {
   type Scene,
   type WebGLRenderer,
 } from "three";
-import { type QualityTierIndex, qualityConfig } from "@/config/quality";
+import {
+  type QualityTierIndex,
+  type QualityTierSpec,
+  qualityConfig,
+} from "@/config/quality";
 import {
   getQualityTierSpec,
   resolveEffectiveShadows,
@@ -24,6 +28,7 @@ export interface QualityControllerProps {
   shadowOverride: ShadowOverride;
   monitoringEnabled: boolean;
   isTabVisible: boolean;
+  onTierChange?: (spec: QualityTierSpec) => void;
 }
 
 function markSceneMaterialsDirty(scene: Scene): void {
@@ -47,7 +52,7 @@ function applyTierToScene(
   setDpr: (dpr: number) => void,
   tier: QualityTierIndex,
   shadowOverride: ShadowOverride,
-): void {
+): QualityTierSpec {
   const spec = getQualityTierSpec(tier);
   const shadows = resolveEffectiveShadows(spec, shadowOverride);
   const targetDpr = Math.min(window.devicePixelRatio || 1, spec.maxDpr);
@@ -92,6 +97,7 @@ function applyTierToScene(
   }
 
   gl.shadowMap.needsUpdate = true;
+  return spec;
 }
 
 export default function QualityController({
@@ -100,9 +106,11 @@ export default function QualityController({
   shadowOverride,
   monitoringEnabled,
   isTabVisible,
+  onTierChange,
 }: QualityControllerProps) {
   const { gl, scene, setDpr } = useThree();
   const tierRef = useRef<QualityTierIndex>(initialTier);
+  const onTierChangeRef = useRef(onTierChange);
   const lastFrameMsRef = useRef<number | null>(null);
   const warmupStartMsRef = useRef<number | null>(null);
   const windowStartMsRef = useRef<number | null>(null);
@@ -111,7 +119,12 @@ export default function QualityController({
   const lastStepMsRef = useRef<number>(-Infinity);
 
   useEffect(() => {
-    applyTierToScene(gl, scene, setDpr, tierRef.current, shadowOverride);
+    onTierChangeRef.current = onTierChange;
+  }, [onTierChange]);
+
+  useEffect(() => {
+    const spec = applyTierToScene(gl, scene, setDpr, tierRef.current, shadowOverride);
+    onTierChangeRef.current?.(spec);
   }, [gl, scene, setDpr, shadowOverride]);
 
   useEffect(() => {
@@ -185,7 +198,8 @@ export default function QualityController({
       lowStreakRef.current = 0;
       lastStepMsRef.current = now;
       saveQualityTier(nextTier);
-      applyTierToScene(gl, scene, setDpr, nextTier, shadowOverride);
+      const spec = applyTierToScene(gl, scene, setDpr, nextTier, shadowOverride);
+      onTierChangeRef.current?.(spec);
     }
   });
 
